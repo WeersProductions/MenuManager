@@ -23,7 +23,7 @@ public class MenuController : MonoBehaviour
     /// <summary>
     /// Used for faster lookup during runtime of menus with specified ids.
     /// </summary>
-    private readonly Dictionary<int, MCMenu> _menus = new Dictionary<int, MCMenu>();
+    private readonly Dictionary<Menus, MCMenu> _menus = new Dictionary<Menus, MCMenu>();
 
     /// <summary>
     /// A list of the active menus on screen.
@@ -49,9 +49,9 @@ public class MenuController : MonoBehaviour
     /// Show a menu with a specific id.
     /// </summary>
     /// <param name="id">The unique id of a menu.</param>
-    public static void ShowMenu(int id)
+    public static void ShowMenu(Menus id)
     {
-        if (id == (int)Menus.NONE)
+        if (id == Menus.NONE)
         {
             HideAllMenus();
         }
@@ -175,9 +175,9 @@ public class MenuController : MonoBehaviour
     /// </summary>
     /// <param name="id"></param>
     /// <param name="createWhenNoMenu"></param>
-    public static void AddPopup(int id, bool createWhenNoMenu)
+    public static void AddPopup(Menus id, bool createWhenNoMenu)
     {
-        if (id < 0)
+        if (id == Menus.NONE)
         {
             return;
         }

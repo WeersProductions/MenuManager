@@ -9,7 +9,7 @@ public class MCMenu : MonoBehaviour
     /// A unique id for this menu.
     /// </summary>
     [SerializeField]
-    private int _id;
+    private MenuController.Menus _id;
 
     /// <summary>
     /// If true this menu wants the whole screen and thus cannot be shown next to another menu.
@@ -41,7 +41,7 @@ public class MCMenu : MonoBehaviour
     /// </summary>
     private MCMenu _parent;
 
-    public int Id
+    public MenuController.Menus Id
     {
         get { return _id; }
     }
