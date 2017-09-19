@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class MenuController : MonoBehaviour
 {
+    /// <summary>
+    /// Static references to the ids of all the menus and popups. Makes it easy to change ids.
+    /// </summary>
+    public enum Menus
+    {
+        NONE = -1
+    }
+
     private static MenuController _instance;
 
     /// <summary>
@@ -43,7 +51,14 @@ public class MenuController : MonoBehaviour
     /// <param name="id">The unique id of a menu.</param>
     public static void ShowMenu(int id)
     {
-        ShowMenu(_instance._menus[id]);
+        if (id == (int)Menus.NONE)
+        {
+            HideAllMenus();
+        }
+        else
+        {
+            ShowMenu(_instance._menus[id]);
+        }
     }
 
     /// <summary>
@@ -71,7 +86,10 @@ public class MenuController : MonoBehaviour
             }
             else
             {
-                _instance._menuQueue.Enqueue(mcMenu);
+                if (mcMenu.ShouldBeQueued)
+                {
+                    _instance._menuQueue.Enqueue(mcMenu);
+                }
                 return;
             }
         }
@@ -150,5 +168,19 @@ public class MenuController : MonoBehaviour
                 return;
             }
         }
+    }
+
+    /// <summary>
+    /// A wrapper for <see cref="AddPopup(MCMenu,bool)"/>
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="createWhenNoMenu"></param>
+    public static void AddPopup(int id, bool createWhenNoMenu)
+    {
+        if (id < 0)
+        {
+            return;
+        }
+        AddPopup(_instance._menus[id], createWhenNoMenu);
     }
 }

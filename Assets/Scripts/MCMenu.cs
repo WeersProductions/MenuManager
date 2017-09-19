@@ -5,9 +5,15 @@ using UnityEngine.Events;
 
 public class MCMenu : MonoBehaviour
 {
+    /// <summary>
+    /// A unique id for this menu.
+    /// </summary>
     [SerializeField]
     private int _id;
 
+    /// <summary>
+    /// If true this menu wants the whole screen and thus cannot be shown next to another menu.
+    /// </summary>
     [SerializeField]
     private bool _fullscreen;
 
@@ -70,6 +76,14 @@ public class MCMenu : MonoBehaviour
     public List<MCMenu> PopupMenus
     {
         get { return _popupMenus; }
+    }
+
+    /// <summary>
+    /// When this menu cannot be shown immediatly, it should be queued for when there is space on screen to show it.
+    /// </summary>
+    public bool ShouldBeQueued
+    {
+        get { return _shouldBeQueued; }
     }
 
     /// <summary>
