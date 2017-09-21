@@ -134,6 +134,7 @@ public class EditorMenuCreator : EditorWindow
         }
 
         EditorGUILayout.Space();
+        EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 
         for (int i = 0; i < _presets.Length; i++)
         {
@@ -146,11 +147,24 @@ public class EditorMenuCreator : EditorWindow
         }
 
         EditorGUILayout.Space();
+        EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 
         if (_currentSelectedPreset != null)
         {
             Editor editor = Editor.CreateEditor(_currentSelectedPreset);
             editor.DrawDefaultInspector();
+
+            EditorGUILayout.Space();
+
+            if (_currentSelectedPreset.PresetObject)
+            {
+                MCMenu mcMenu = _currentSelectedPreset.PresetObject.GetComponentInChildren<MCMenu>();
+                if (mcMenu)
+                {
+                    Editor mcEditor = Editor.CreateEditor(mcMenu);
+                    mcEditor.DrawDefaultInspector();
+                }
+            }
         }
     }
 
