@@ -1,197 +1,199 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class MCMenu : MonoBehaviour
+namespace WeersProductions
 {
-    /// <summary>
-    /// A unique id for this menu.
-    /// </summary>
-    [SerializeField]
-    private MenuController.Menus _id;
-
-    /// <summary>
-    /// If true this menu wants the whole screen and thus cannot be shown next to another menu.
-    /// </summary>
-    [SerializeField]
-    private bool _fullscreen;
-
-    /// <summary>
-    /// If true, when another menu wants to show up, it will close this menu.
-    /// If false, the new menu will be put in a queue for when this menu gets closed.
-    /// </summary>
-    [SerializeField]
-    private bool _canBeClosed;
-
-    /// <summary>
-    /// When this menu cannot be shown immediatly, it should be queued for when there is space on screen to show it.
-    /// </summary>
-    [SerializeField]
-    private bool _shouldBeQueued;
-
-    /// <summary>
-    /// A list of popups that this menu owns.
-    /// These will be closed when this menu will be closed.
-    /// </summary>
-    private readonly List<MCMenu> _popupMenus = new List<MCMenu>();
-
-    /// <summary>
-    /// If this is a popup menu, or a menu owned by another menu, the parent is not null.
-    /// </summary>
-    private MCMenu _parent;
-
-    public MenuController.Menus Id
+    public class MCMenu : MonoBehaviour
     {
-        get { return _id; }
-    }
+        /// <summary>
+        /// A unique id for this menu.
+        /// </summary>
+        [SerializeField]
+        private MenuController.Menus _id;
 
-    public bool Fullscreen
-    {
-        get { return _fullscreen; }
-    }
+        /// <summary>
+        /// If true this menu wants the whole screen and thus cannot be shown next to another menu.
+        /// </summary>
+        [SerializeField]
+        private bool _fullscreen;
 
-    /// <summary>
-    /// If true, when another menu wants to show up, it will close this menu.
-    /// If false, the new menu will be put in a queue for when this menu gets closed.
-    /// </summary>
-    public bool CanBeClosed
-    {
-        get { return _canBeClosed; }
-    }
+        /// <summary>
+        /// If true, when another menu wants to show up, it will close this menu.
+        /// If false, the new menu will be put in a queue for when this menu gets closed.
+        /// </summary>
+        [SerializeField]
+        private bool _canBeClosed;
 
-    /// <summary>
-    /// If this is a popup menu, or a menu owned by another menu, the parent is not null.
-    /// </summary>
-    public MCMenu Parent
-    {
-        get { return _parent; }
-        set { _parent = value; }
-    }
+        /// <summary>
+        /// When this menu cannot be shown immediatly, it should be queued for when there is space on screen to show it.
+        /// </summary>
+        [SerializeField]
+        private bool _shouldBeQueued;
 
-    /// <summary>
-    /// A list of popups that this menu owns.
-    /// These will be closed when this menu will be closed.
-    /// </summary>
-    public List<MCMenu> PopupMenus
-    {
-        get { return _popupMenus; }
-    }
+        /// <summary>
+        /// A list of popups that this menu owns.
+        /// These will be closed when this menu will be closed.
+        /// </summary>
+        private readonly List<MCMenu> _popupMenus = new List<MCMenu>();
 
-    /// <summary>
-    /// When this menu cannot be shown immediatly, it should be queued for when there is space on screen to show it.
-    /// </summary>
-    public bool ShouldBeQueued
-    {
-        get { return _shouldBeQueued; }
-    }
+        /// <summary>
+        /// If this is a popup menu, or a menu owned by another menu, the parent is not null.
+        /// </summary>
+        private MCMenu _parent;
 
-    /// <summary>
-    /// Called when this menu should be shown, can be used for animations.
-    /// </summary>
-    public void Show()
-    {
-        gameObject.SetActive(true);
-    }
-
-    /// <summary>
-    /// A simple wrapper that will call <see cref="MenuController.HideMenu"/> for itself.
-    /// </summary>
-    public void Hide()
-    {
-        MenuController.HideMenu(this);
-    }
-
-    /// <summary>
-    /// Called when this menu should be hidden.
-    /// </summary>
-    /// <param name="afterHidden">A function that should be called when this menu is hidden.</param>
-    public void Hide(UnityAction afterHidden)
-    {
-        // Remove all null values for popupMenus that are destroyed.
-        PopupMenus.RemoveAll(menu => !menu);
-
-        if (PopupMenus.Count <= 0)
+        public MenuController.Menus Id
         {
-            // There are no popups to take care of, increase performance and skip those.
-            OnHide(afterHidden);
+            get { return _id; }
         }
-        else
+
+        public bool Fullscreen
         {
-            RemoveAllPopups(() =>
+            get { return _fullscreen; }
+        }
+
+        /// <summary>
+        /// If true, when another menu wants to show up, it will close this menu.
+        /// If false, the new menu will be put in a queue for when this menu gets closed.
+        /// </summary>
+        public bool CanBeClosed
+        {
+            get { return _canBeClosed; }
+        }
+
+        /// <summary>
+        /// If this is a popup menu, or a menu owned by another menu, the parent is not null.
+        /// </summary>
+        public MCMenu Parent
+        {
+            get { return _parent; }
+            set { _parent = value; }
+        }
+
+        /// <summary>
+        /// A list of popups that this menu owns.
+        /// These will be closed when this menu will be closed.
+        /// </summary>
+        public List<MCMenu> PopupMenus
+        {
+            get { return _popupMenus; }
+        }
+
+        /// <summary>
+        /// When this menu cannot be shown immediatly, it should be queued for when there is space on screen to show it.
+        /// </summary>
+        public bool ShouldBeQueued
+        {
+            get { return _shouldBeQueued; }
+        }
+
+        /// <summary>
+        /// Called when this menu should be shown, can be used for animations.
+        /// </summary>
+        public void Show(object data)
+        {
+            gameObject.SetActive(true);
+        }
+
+        /// <summary>
+        /// A simple wrapper that will call <see cref="MenuController.HideMenu"/> for itself.
+        /// </summary>
+        public void Hide()
+        {
+            MenuController.HideMenu(this);
+        }
+
+        /// <summary>
+        /// Called when this menu should be hidden.
+        /// </summary>
+        /// <param name="afterHidden">A function that should be called when this menu is hidden.</param>
+        public void Hide(UnityAction afterHidden)
+        {
+            // Remove all null values for popupMenus that are destroyed.
+            PopupMenus.RemoveAll(menu => !menu);
+
+            if (PopupMenus.Count <= 0)
             {
+                // There are no popups to take care of, increase performance and skip those.
+                OnHide(afterHidden);
+            }
+            else
+            {
+                RemoveAllPopups(() =>
+                {
                 // There are no popupMenus left, we can actually hide the parent menu.
                 OnHide(afterHidden);
-            });
+                });
+            }
         }
-    }
 
-    /// <summary>
-    /// Called when the Menu is being hidden.
-    /// Only this menu will be hidden here, no popups or child menus are called in here.
-    /// </summary>
-    /// <param name="afterHidden"></param>
-    protected virtual void OnHide(UnityAction afterHidden)
-    {
-        gameObject.SetActive(false);
-        afterHidden();
-    }
-
-    /// <summary>
-    /// Add a popup to this menu and assign this menu as the parent for the popup.
-    /// </summary>
-    /// <param name="mcMenu"></param>
-    public void AddPopup(MCMenu mcMenu)
-    {
-        PopupMenus.Add(mcMenu);
-        mcMenu.Parent = this;
-        mcMenu.Show();
-    }
-
-    /// <summary>
-    /// Remove a specific popup menu.
-    /// </summary>
-    /// <param name="mcMenu"></param>
-    public void RemovePopup(MCMenu mcMenu)
-    {
-        PopupMenus.Remove(mcMenu);
-        mcMenu.Parent = null;
-        mcMenu.Hide();
-    }
-
-    /// <summary>
-    /// Removes all popups from this menu.
-    /// </summary>
-    /// <param name="afterHidden"></param>
-    public void RemoveAllPopups(UnityAction afterHidden)
-    {
-        // Create a copy to not edit the list while looping through it.
-        List<MCMenu> popupMenuCopy = new List<MCMenu>(PopupMenus);
-        for (int i = 0; i < popupMenuCopy.Count; i++)
+        /// <summary>
+        /// Called when the Menu is being hidden.
+        /// Only this menu will be hidden here, no popups or child menus are called in here.
+        /// </summary>
+        /// <param name="afterHidden"></param>
+        protected virtual void OnHide(UnityAction afterHidden)
         {
-            int currentIndex = i;
+            gameObject.SetActive(false);
+            afterHidden();
+        }
 
-            // Hide each popupMenu.
-            popupMenuCopy[i].Hide(() =>
+        /// <summary>
+        /// Add a popup to this menu and assign this menu as the parent for the popup.
+        /// </summary>
+        /// <param name="mcMenu"></param>
+        public void AddPopup(MCMenu mcMenu)
+        {
+            PopupMenus.Add(mcMenu);
+            mcMenu.Parent = this;
+            mcMenu.Show();
+        }
+
+        /// <summary>
+        /// Remove a specific popup menu.
+        /// </summary>
+        /// <param name="mcMenu"></param>
+        public void RemovePopup(MCMenu mcMenu)
+        {
+            PopupMenus.Remove(mcMenu);
+            mcMenu.Parent = null;
+            mcMenu.Hide();
+        }
+
+        /// <summary>
+        /// Removes all popups from this menu.
+        /// </summary>
+        /// <param name="afterHidden"></param>
+        public void RemoveAllPopups(UnityAction afterHidden)
+        {
+            // Create a copy to not edit the list while looping through it.
+            List<MCMenu> popupMenuCopy = new List<MCMenu>(PopupMenus);
+            for (int i = 0; i < popupMenuCopy.Count; i++)
             {
+                int currentIndex = i;
+
+                // Hide each popupMenu.
+                popupMenuCopy[i].Hide(() =>
+                {
                 // Called when this popup menu is closed.
                 PopupMenus.Remove(popupMenuCopy[currentIndex]);
 
-                if (PopupMenus.Count <= 0)
-                {
-                    if (afterHidden != null)
+                    if (PopupMenus.Count <= 0)
                     {
-                        afterHidden();
+                        if (afterHidden != null)
+                        {
+                            afterHidden();
+                        }
                     }
-                }
-            });
+                });
+            }
         }
-    }
 
 #if UNITY_EDITOR
-    public void SetId(MenuController.Menus menus)
-    {
-        _id = menus;
-    }
+        public void SetId(MenuController.Menus menus)
+        {
+            _id = menus;
+        }
 #endif
+    }
 }

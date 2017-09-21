@@ -1,12 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class EditorMenuCreatorSettings : ScriptableObject
+namespace WeersProductions
 {
-    public const string SettingsPath = "assets/MenuManager/Editor/Settings.asset";
+    public class EditorMenuCreatorSettings : ScriptableObject
+    {
+        public const string SettingsPath = "assets/MenuManager/Editor/Settings.asset";
 
-    public RectTransform MenuParent;
-    public string DefaultPresetPath = "/MenuManager/Presets/";
-    public MenuController MenuController;
+        public RectTransform MenuParent;
+        public string DefaultPresetPath = "/MenuManager/Presets/";
+        public MenuController MenuController;
+    }
 }

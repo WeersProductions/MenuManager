@@ -2,29 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MenuCreatorPreset : ScriptableObject
+namespace WeersProductions
 {
-    [SerializeField]
-    private string _title;
-
-    [SerializeField]
-    private string _description;
-
-    [SerializeField]
-    private GameObject _presetObject;
-
-    public string Title
+    public class MenuCreatorPreset : ScriptableObject
     {
-        get { return _title; }
-    }
+        [SerializeField] private string _title;
 
-    public string Description
-    {
-        get { return _description; }
-    }
+        [SerializeField] private string _description;
 
-    public GameObject PresetObject
-    {
-        get { return _presetObject; }
+        [SerializeField] private GameObject _presetObject;
+
+        public string Title
+        {
+            get { return _title; }
+        }
+
+        public string Description
+        {
+            get { return _description; }
+        }
+
+        public GameObject PresetObject
+        {
+            get { return _presetObject; }
+        }
     }
 }
