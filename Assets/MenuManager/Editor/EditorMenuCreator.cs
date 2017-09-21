@@ -17,6 +17,8 @@ public class EditorMenuCreator : EditorWindow
     private MenuCreatorPreset[] _presets;
     private string[] _presetTitles;
     private string[] _presetDescriptions;
+
+    private SerializedObject _menuController;
     #endregion
 
     #region create preset
@@ -35,23 +37,16 @@ public class EditorMenuCreator : EditorWindow
     [MenuItem("WeersProductions/Create menu")]
     private static void Init()
     {
-        EditorMenuCreator editorMenuCreator = EditorWindow.GetWindow<EditorMenuCreator>();
+        EditorMenuCreator editorMenuCreator = GetWindow<EditorMenuCreator>();
         editorMenuCreator.Show();
     }
 
     private void OnEnable()
     {
         // Make sure we have an object to store our settings
-        EditorMenuCreatorSettings settingsAsset = (EditorMenuCreatorSettings)AssetDatabase.LoadAssetAtPath(EditorMenuCreatorSettings.SettingsPath, typeof(EditorMenuCreatorSettings));
-        if (!settingsAsset)
-        {
-            settingsAsset = CreateInstance<EditorMenuCreatorSettings>();
-            AssetDatabase.CreateAsset(settingsAsset, EditorMenuCreatorSettings.SettingsPath);
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
-        }
+        CreateOrLoadSettings();
 
-        _editorMenuCreatorSettings = settingsAsset;
+
 
         _tabsBlock = new TabsBlock(new Dictionary<string, Action>
         {
@@ -92,7 +87,25 @@ public class EditorMenuCreator : EditorWindow
 
     private void CreateMenu(MenuCreatorPreset menuCreatorPreset)
     {
-        Instantiate(menuCreatorPreset.PresetObject, _editorMenuCreatorSettings.MenuParent);
+        GameObject newMenu = Instantiate(menuCreatorPreset.PresetObject, _editorMenuCreatorSettings.MenuParent);
+        MCMenu mcMenu = newMenu.GetComponentInChildren<MCMenu>();
+        if (mcMenu)
+        {
+            mcMenu.SetId(MenuController.Menus.UNDEFINED);
+
+            if (_editorMenuCreatorSettings.MenuController)
+            {
+                if (_menuController == null)
+                {
+                    _menuController = new SerializedObject(_editorMenuCreatorSettings.MenuController);
+                }
+                _menuController.Update();
+                SerializedProperty menuArray = _menuController.FindProperty("_mcMenus");
+                menuArray.arraySize += 1;
+                menuArray.GetArrayElementAtIndex(menuArray.arraySize - 1).objectReferenceValue = mcMenu;
+                _menuController.ApplyModifiedProperties();
+            }
+        }
     }
 
     private void DrawCreatePreset()
@@ -165,6 +178,13 @@ public class EditorMenuCreator : EditorWindow
     {
         _editorMenuCreatorSettings.MenuParent = (RectTransform)EditorGUILayout.ObjectField("Parent of new menus", _editorMenuCreatorSettings.MenuParent, typeof(RectTransform), true);
         _editorMenuCreatorSettings.DefaultPresetPath = EditorGUILayout.TextField("Preset location", _editorMenuCreatorSettings.DefaultPresetPath);
+        _editorMenuCreatorSettings.MenuController = (MenuController)EditorGUILayout.ObjectField("Menu Controller",
+            _editorMenuCreatorSettings.MenuController, typeof(MenuController), true);
+
+        if (GUI.changed)
+        {
+            EditorUtility.SetDirty(_editorMenuCreatorSettings);
+        }
     }
 
     /// <summary>
@@ -202,5 +222,26 @@ public class EditorMenuCreator : EditorWindow
     {
         _presets = null;
         CheckPresets();
+    }
+
+    private void CreateOrLoadSettings()
+    {
+        EditorMenuCreatorSettings settingsAsset = (EditorMenuCreatorSettings)AssetDatabase.LoadAssetAtPath(EditorMenuCreatorSettings.SettingsPath, typeof(EditorMenuCreatorSettings));
+        if (!settingsAsset)
+        {
+            settingsAsset = CreateInstance<EditorMenuCreatorSettings>();
+            AssetDatabase.CreateAsset(settingsAsset, EditorMenuCreatorSettings.SettingsPath);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+        }
+
+        _editorMenuCreatorSettings = settingsAsset;
+
+        if (!_editorMenuCreatorSettings.MenuController)
+        {
+            MenuController menuController = FindObjectOfType<MenuController>();
+            _editorMenuCreatorSettings.MenuController = menuController;
+            EditorUtility.SetDirty(_editorMenuCreatorSettings);
+        }
     }
 }

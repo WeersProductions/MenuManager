@@ -9,6 +9,7 @@ public class MenuController : MonoBehaviour
     /// </summary>
     public enum Menus
     {
+        UNDEFINED = -2,
         NONE = -1
     }
 

@@ -187,4 +187,11 @@ public class MCMenu : MonoBehaviour
             });
         }
     }
+
+#if UNITY_EDITOR
+    public void SetId(MenuController.Menus menus)
+    {
+        _id = menus;
+    }
+#endif
 }

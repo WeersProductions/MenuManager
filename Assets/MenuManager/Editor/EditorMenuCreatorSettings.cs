@@ -8,4 +8,5 @@ public class EditorMenuCreatorSettings : ScriptableObject
 
     public RectTransform MenuParent;
     public string DefaultPresetPath = "/MenuManager/Presets/";
+    public MenuController MenuController;
 }
