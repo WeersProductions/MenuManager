@@ -90,7 +90,7 @@ namespace WeersProductions
         /// <summary>
         /// Called when this menu should be shown, can be used for animations.
         /// </summary>
-        public void Show(object data)
+        public virtual void Show(object data)
         {
             gameObject.SetActive(true);
         }
@@ -142,11 +142,11 @@ namespace WeersProductions
         /// Add a popup to this menu and assign this menu as the parent for the popup.
         /// </summary>
         /// <param name="mcMenu"></param>
-        public void AddPopup(MCMenu mcMenu)
+        public void AddPopup(MCMenu mcMenu, object data = null)
         {
             PopupMenus.Add(mcMenu);
             mcMenu.Parent = this;
-            mcMenu.Show();
+            mcMenu.Show(data);
         }
 
         /// <summary>

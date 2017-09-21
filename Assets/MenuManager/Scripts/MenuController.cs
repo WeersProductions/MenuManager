@@ -11,7 +11,8 @@ namespace WeersProductions
         public enum Menus
         {
             UNDEFINED = -2,
-            NONE = -1
+            NONE = -1,
+            SIMPLEPOPUP = 0
         }
 
         /// <summary>
@@ -157,11 +158,11 @@ namespace WeersProductions
         /// <param name="mcMenu"></param>
         /// <param name="createWhenNoMenu">If true this popup will be made an active window in the case of no active windows at the time of calling this.
         /// If false, no popup will be shown if there is no active window.</param>
-        public static void AddPopup(MCMenu mcMenu, bool createWhenNoMenu)
+        public static void AddPopup(MCMenu mcMenu, bool createWhenNoMenu, object data = null)
         {
             if (_instance._activeMenus.Count > 0)
             {
-                _instance._activeMenus[0].AddPopup(mcMenu);
+                _instance._activeMenus[0].AddPopup(mcMenu, data);
             }
             else
             {
