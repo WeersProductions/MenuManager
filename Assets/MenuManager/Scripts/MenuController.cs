@@ -36,7 +36,13 @@ namespace WeersProductions
         private readonly List<MCMenu> _activeMenus = new List<MCMenu>();
 
         /// <summary>
+        /// A set of pooling objects from menus.
+        /// </summary>
+        private readonly Dictionary<Menus, Queue<MCMenu>> _menuPool = new Dictionary<Menus, Queue<MCMenu>>();
+
+        /// <summary>
         /// A queue of menus that want to be popupped up when another menu is closed.
+        /// This queue contains copy of the original menus, so you don't have to duplicate them anymore.
         /// </summary>
         private readonly Queue<MenuQueueItem> _menuQueue = new Queue<MenuQueueItem>();
 
@@ -54,25 +60,29 @@ namespace WeersProductions
         /// Show a menu with a specific id.
         /// </summary>
         /// <param name="id">The unique id of a menu.</param>
-        public static void ShowMenu(Menus id)
+        /// <param name="mcMenuData"></param>
+        public static MCMenu ShowMenu(Menus id, object mcMenuData = null)
         {
-            if (id == Menus.NONE)
-            {
-                HideAllMenus();
-            }
-            else
-            {
-                ShowMenu(_instance._menus[id]);
-            }
+             return ShowMenu(GetPoolObject(id), mcMenuData);
+        }
+
+        /// <summary>
+        /// Will return a duplicate of the original menu so it can be used in the method <see cref="ShowMenu(WeersProductions.MCMenu,object)"/>
+        /// </summary>
+        /// <param name="id">The TYPE of the menu</param>
+        /// <returns></returns>
+        public static MCMenu GetMenu(Menus id)
+        {
+            return GetPoolObject(id);
         }
 
         /// <summary>
         /// Show a specific menu.
         /// If this menu needs fullscreen and the current active menus allow it to override them, it will close the current menus.
         /// </summary>
-        /// <param name="mcMenu">The new menu.</param>
+        /// <param name="mcMenu">The new menu. (this is a copy of the original)</param>
         /// <param name="mcMenuData"></param>
-        public static void ShowMenu(MCMenu mcMenu, object mcMenuData = null)
+        public static MCMenu ShowMenu(MCMenu mcMenu, object mcMenuData = null)
         {
             if (mcMenu.Fullscreen)
             {
@@ -96,13 +106,14 @@ namespace WeersProductions
                     {
                         _instance._menuQueue.Enqueue(new MenuQueueItem(mcMenu, mcMenuData));
                     }
-                    return;
+                    return mcMenu;
                 }
             }
 
             // We can show this one.
             mcMenu.Show(mcMenuData);
             _instance._activeMenus.Add(mcMenu);
+            return mcMenu;
         }
 
         /// <summary>
@@ -110,9 +121,10 @@ namespace WeersProductions
         /// </summary>
         public static void HideAllMenus()
         {
-            for (int i = 0; i < _instance._activeMenus.Count; i++)
+            List<MCMenu> copy = new List<MCMenu>(_instance._activeMenus);
+            for (int i = 0; i < copy.Count; i++)
             {
-                HideMenu(_instance._activeMenus[i]);
+                HideMenu(copy[i]);
             }
         }
 
@@ -131,8 +143,23 @@ namespace WeersProductions
         /// <param name="mcMenu"></param>
         private static void OnHideMenu(MCMenu mcMenu)
         {
-            _instance._activeMenus.Remove(mcMenu);
-            CheckMenuQueue();
+            if (_instance._activeMenus.Contains(mcMenu))
+            {
+                _instance._activeMenus.Remove(mcMenu);
+                // Only check the menu when we actually removed something.
+                CheckMenuQueue();
+            }
+
+            if (mcMenu.ShouldBePooled)
+            {
+                // It should be pooled, add it.
+                AddPoolObject(mcMenu);
+            }
+            else
+            {
+                // Since it should not be pooled, we destroy it.
+                Destroy(mcMenu.gameObject);
+            }
         }
 
         /// <summary>
@@ -158,6 +185,7 @@ namespace WeersProductions
         /// <param name="mcMenu"></param>
         /// <param name="createWhenNoMenu">If true this popup will be made an active window in the case of no active windows at the time of calling this.
         /// If false, no popup will be shown if there is no active window.</param>
+        /// <param name="data"></param>
         public static void AddPopup(MCMenu mcMenu, bool createWhenNoMenu, object data = null)
         {
             if (_instance._activeMenus.Count > 0)
@@ -168,7 +196,7 @@ namespace WeersProductions
             {
                 if (createWhenNoMenu)
                 {
-                    ShowMenu(mcMenu);
+                    ShowMenu(mcMenu, data);
                 }
                 else
                 {
@@ -188,7 +216,44 @@ namespace WeersProductions
             {
                 return;
             }
-            AddPopup(_instance._menus[id], createWhenNoMenu);
+            AddPopup(GetPoolObject(id), createWhenNoMenu);
+        }
+
+        /// <summary>
+        /// Returns a poolObject if available, otherwise it will instantiate a new menu.
+        /// </summary>
+        /// <param name="menu"></param>
+        /// <returns></returns>
+        private static MCMenu GetPoolObject(Menus menu)
+        {
+            Queue<MCMenu> menus;
+            if (_instance._menuPool.TryGetValue(menu, out menus))
+            {
+                if (menus.Count > 0)
+                {
+                    return menus.Dequeue();
+                }
+            }
+
+            // We could not find a poolObject, instantiate a new object.
+            return Instantiate(_instance._menus[menu], _instance.transform);
+        }
+
+        /// <summary>
+        /// Add a poolObject to the pool for a certain menu.
+        /// Only does data managing, the object should already be ready for pooling (E.G. inactive).
+        /// </summary>
+        /// <param name="menu"></param>
+        private static void AddPoolObject(MCMenu menu)
+        {
+            Queue<MCMenu> menus;
+            if (!_instance._menuPool.TryGetValue(menu.Id, out menus))
+            {
+                menus = new Queue<MCMenu>();
+                _instance._menuPool.Add(menu.Id, menus);
+            }
+
+            menus.Enqueue(menu);
         }
     }
 

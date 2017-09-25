@@ -13,5 +13,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _title: asdf
   _description: fdsa
-  _presetObject: {fileID: 1599600992105380, guid: 61288fa7586341047a7cb1a69096d54f,
-    type: 2}
+  _presetObject: {fileID: 0}

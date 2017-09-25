@@ -23,13 +23,21 @@ namespace WeersProductions
         /// If false, the new menu will be put in a queue for when this menu gets closed.
         /// </summary>
         [SerializeField]
-        private bool _canBeClosed;
+        private bool _canBeClosed = true;
 
         /// <summary>
         /// When this menu cannot be shown immediatly, it should be queued for when there is space on screen to show it.
         /// </summary>
         [SerializeField]
         private bool _shouldBeQueued;
+
+        /// <summary>
+        /// If true this menu will be pooled and thus will not be destroyed after use.
+        /// </summary>
+        [SerializeField]
+        private bool _shouldBePooled = true;
+
+        //TODO: Add pool amount if it should be pooled (E.G. max 5 objects).
 
         /// <summary>
         /// A list of popups that this menu owns.
@@ -85,6 +93,14 @@ namespace WeersProductions
         public bool ShouldBeQueued
         {
             get { return _shouldBeQueued; }
+        }
+
+        /// <summary>
+        /// If true this menu will be pooled and thus will not be destroyed after use.
+        /// </summary>
+        public bool ShouldBePooled
+        {
+            get { return _shouldBePooled; }
         }
 
         /// <summary>

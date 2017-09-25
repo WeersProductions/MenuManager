@@ -80,9 +80,18 @@ namespace WeersProductions
 
             EditorGUILayout.HelpBox(_presetDescriptions[_selectedPreset], MessageType.Info);
 
-            if (GUILayout.Button("Create menu"))
+            bool hasPresetObject = _presets[_selectedPreset].PresetObject;
+            if (!hasPresetObject)
             {
-                CreateMenu(_presets[_selectedPreset]);
+                EditorGUILayout.HelpBox("This preset doesn't seem to have a Preset Object!", MessageType.Warning);
+            }
+
+            using (new EditorGUI.DisabledScope(!hasPresetObject))
+            {
+                if (GUILayout.Button("Create menu"))
+                {
+                    CreateMenu(_presets[_selectedPreset]);
+                }
             }
         }
 
@@ -92,8 +101,6 @@ namespace WeersProductions
             MCMenu mcMenu = newMenu.GetComponentInChildren<MCMenu>();
             if (mcMenu)
             {
-                mcMenu.SetId(MenuController.Menus.UNDEFINED);
-
                 if (_editorMenuCreatorSettings.MenuController)
                 {
                     if (_menuController == null)

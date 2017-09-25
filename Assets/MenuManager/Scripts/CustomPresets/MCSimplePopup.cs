@@ -50,7 +50,7 @@ namespace WeersProductions
             _descriptionText.text = simplePopupData.Description;
 
             bool hasButtons = simplePopupData.ButtonActions !=  null && simplePopupData.ButtonActions.Length > 0;
-            _disableIfNoButtons.SetActive(!hasButtons);
+            _disableIfNoButtons.SetActive(hasButtons);
             if (hasButtons)
             {
                 for (int i = 0; i < simplePopupData.ButtonActions.Length; i++)
@@ -58,9 +58,8 @@ namespace WeersProductions
                     Button newButton = Instantiate(_buttonPrefab, _buttonParent);
                     newButton.onClick.RemoveAllListeners();
                     newButton.onClick.AddListener(simplePopupData.ButtonActions[i]);
-
                     
-                    if (simplePopupData.ButtonSprites.Length > i)
+                    if (simplePopupData.ButtonSprites != null && simplePopupData.ButtonSprites.Length > i)
                     {
                         Image imageChild = newButton.GetComponentInChildren<Image>();
                         imageChild.sprite = simplePopupData.ButtonSprites[i];
@@ -74,6 +73,8 @@ namespace WeersProductions
                     newButton.gameObject.SetActive(true);
                 }
             }
+
+            _buttonPrefab.gameObject.SetActive(false);
         }
     }
 }
