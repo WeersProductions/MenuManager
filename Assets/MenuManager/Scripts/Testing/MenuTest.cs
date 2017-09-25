@@ -22,9 +22,8 @@ namespace WeersProductions
                     button => { MenuController.HideMenu(popupMenu.Parent); },
                     button =>
                     {
-                        MCSimpleTooltipData simpleTooltipData = new MCSimpleTooltipData("Tooltip", "More text",
-                            button.GetComponent<RectTransform>());
-                        simpleTooltipData.AutoRemove = true;
+                        var simpleTooltipData = new MCSimpleTooltipData("Tooltip", "More text",
+                            button.GetComponent<RectTransform>()) {AutoRemove = true};
                         MenuController.AddPopup(MenuController.Menus.SIMPLETOOLTIP, false, simpleTooltipData);
                     }
                 }, new[]
