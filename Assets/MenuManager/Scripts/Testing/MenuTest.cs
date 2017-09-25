@@ -1,40 +1,39 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Events;
-using WeersProductions;
+﻿using UnityEngine;
 
 namespace WeersProductions
 {
     public class MenuTest : MonoBehaviour
     {
         // Use this for initialization
-        void Start()
+        private void Start()
         {
             CreatePopup(0);
         }
 
-        void CreatePopup(int count)
+        private void CreatePopup(int count)
         {
-            MCMenu popupMenu = MenuController.GetMenu(MenuController.Menus.SIMPLEPOPUP);
+            var popupMenu = MenuController.GetMenu(MenuController.Menus.SIMPLEPOPUP);
 
-            MCSimplePopupData simplePopupData = new MCSimplePopupData("title " + count, "This is another popup.", new UnityAction[]
-            {
-                () =>
+            var simplePopupData = new MCSimplePopupData("title " + count, "This is another popup.",
+                new MCSimplePopupData.ButtonClick[]
                 {
-                    CreatePopup(count + 1);
-                },
-                popupMenu.Hide,
-                () =>
+                    button => { CreatePopup(count + 1); },
+                    button => popupMenu.Hide(),
+                    button => { MenuController.HideMenu(popupMenu.Parent); },
+                    button =>
+                    {
+                        MCSimpleTooltipData simpleTooltipData = new MCSimpleTooltipData("Tooltip", "More text",
+                            button.GetComponent<RectTransform>());
+                        simpleTooltipData.AutoRemove = true;
+                        MenuController.AddPopup(MenuController.Menus.SIMPLETOOLTIP, false, simpleTooltipData);
+                    }
+                }, new[]
                 {
-                    MenuController.HideMenu(popupMenu.Parent);
-                }
-            }, new[]
-            {
-                "New popup",
-                "Close this",
-                "Close parent"
-            });
+                    "New popup",
+                    "Close this",
+                    "Close parent",
+                    "Tooltip"
+                });
 
             MenuController.AddPopup(popupMenu, true, simplePopupData);
         }

@@ -2,23 +2,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using WeersProductions;
 
 namespace WeersProductions
 {
-    public class MCSimplePopup : MCMenu
+    /// <summary>
+    /// Adds buttons to the tooltip and makes it draggable.
+    /// </summary>
+    public class MCSimplePopup : MCSimpleTooltip, IDraggableMenu
     {
-        [SerializeField]
-        private Text _titleText;
-        [SerializeField]
-        private GameObject _disableIfNoTitle;
-
-        [SerializeField]
-        private Text _descriptionText;
-        [SerializeField]
-        private GameObject _disableIfNoDescription;
-
         [SerializeField]
         private Button _buttonPrefab;
 
@@ -41,14 +35,7 @@ namespace WeersProductions
             {
                 throw new Exception("Trying to show a simple popup, but using the wrong data type: " + data.GetType());
             }
-
-
-            _disableIfNoTitle.SetActive(!string.IsNullOrEmpty(simplePopupData.Title));
-            _titleText.text = simplePopupData.Title;
-
-            _disableIfNoDescription.SetActive(!string.IsNullOrEmpty(simplePopupData.Description));
-            _descriptionText.text = simplePopupData.Description;
-
+            
             bool hasButtons = simplePopupData.ButtonActions !=  null && simplePopupData.ButtonActions.Length > 0;
             _disableIfNoButtons.SetActive(hasButtons);
             if (hasButtons)
@@ -57,8 +44,9 @@ namespace WeersProductions
                 {
                     Button newButton = Instantiate(_buttonPrefab, _buttonParent);
                     newButton.onClick.RemoveAllListeners();
-                    newButton.onClick.AddListener(simplePopupData.ButtonActions[i]);
-                    
+                    var numberIndex = i;
+                    newButton.onClick.AddListener(() => simplePopupData.ButtonActions[numberIndex](newButton));
+
                     if (simplePopupData.ButtonSprites != null && simplePopupData.ButtonSprites.Length > i)
                     {
                         Image imageChild = newButton.GetComponentInChildren<Image>();
@@ -75,6 +63,37 @@ namespace WeersProductions
             }
 
             _buttonPrefab.gameObject.SetActive(false);
+
+            gameObject.SetActive(true);
+        }
+
+        public void OnBeginDrag(PointerEventData eventData)
+        {
+            Debug.Log("Show something visual");
+        }
+
+        public void OnDrag(PointerEventData eventData)
+        {
+            this.transform.position += new Vector3(eventData.delta.x, eventData.delta.y);
+        }
+
+        public void OnEndDrag(PointerEventData eventData)
+        {
+            Debug.Log("Stop the special visual");
+        }
+
+        public override void PrepareForPool()
+        {
+            base.PrepareForPool();
+            Button[] buttons = _buttonParent.GetComponentsInChildren<Button>();
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                if (buttons[i] != _buttonPrefab)
+                {
+                    Destroy(buttons[i].gameObject);
+                }
+            }
+            _buttonPrefab.gameObject.SetActive(true);
         }
     }
 }

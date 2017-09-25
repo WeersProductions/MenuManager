@@ -1,64 +1,32 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
-public class MCSimplePopupData
+namespace WeersProductions
 {
-    private string _title;
-    private string _description;
-    private UnityAction[] _buttonActions;
-    private string[] _buttonStrings;
-    private Sprite[] _buttonSprites;
-
-    public MCSimplePopupData(string title, string description)
+    public class MCSimplePopupData : MCSimpleTooltipData
     {
-        _title = title;
-        _description = description;
-    }
+        public delegate void ButtonClick(Button button);
 
-    public MCSimplePopupData(string title, string description, UnityAction[] buttonActions, string[] buttonStrings) : this(title, description)
-    {
-        _buttonActions = buttonActions;
-        _buttonStrings = buttonStrings;
-    }
+        public MCSimplePopupData(string title, string description, ButtonClick[] buttonActions, string[] buttonStrings)
+            : base(title, description)
+        {
+            ButtonActions = buttonActions;
+            ButtonStrings = buttonStrings;
+        }
 
-    public MCSimplePopupData(string title, string description, UnityAction[] buttonActions, Sprite[] buttonSprites) : this(
-        title, description)
-    {
-        _buttonActions = buttonActions;
-        _buttonSprites = buttonSprites;
-    }
+        public MCSimplePopupData(string title, string description, ButtonClick[] buttonActions,
+            Sprite[] buttonSprites) : base(
+            title, description)
+        {
+            ButtonActions = buttonActions;
+            ButtonSprites = buttonSprites;
+        }
 
+        public ButtonClick[] ButtonActions { get; set; }
 
-    public string Title
-    {
-        get { return _title; }
-        set { _title = value; }
-    }
+        public string[] ButtonStrings { get; set; }
 
-    public string Description
-    {
-        get { return _description; }
-        set { _description = value; }
-    }
-
-    public UnityAction[] ButtonActions
-    {
-        get { return _buttonActions; }
-        set { _buttonActions = value; }
-    }
-
-    public string[] ButtonStrings
-    {
-        get { return _buttonStrings; }
-        set { _buttonStrings = value; }
-    }
-
-    public Sprite[] ButtonSprites
-    {
-        get { return _buttonSprites; }
-        set { _buttonSprites = value; }
+        public Sprite[] ButtonSprites { get; set; }
     }
 }

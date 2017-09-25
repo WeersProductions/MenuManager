@@ -83,7 +83,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &1545853871639352
 GameObject:
   m_ObjectHideFlags: 0
@@ -93,6 +93,7 @@ GameObject:
   m_Component:
   - component: {fileID: 224917282169589012}
   - component: {fileID: 114204750629358802}
+  - component: {fileID: 114705438309859172}
   m_Layer: 5
   m_Name: Header
   m_TagString: Untagged
@@ -398,6 +399,17 @@ MonoBehaviour:
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 1
   m_ChildControlHeight: 1
+--- !u!114 &114705438309859172
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1545853871639352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 781bd693b66588747acdd020a246c297, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114732642492592384
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -449,10 +461,10 @@ MonoBehaviour:
   _canBeClosed: 1
   _shouldBeQueued: 1
   _shouldBePooled: 1
-  _titleText: {fileID: 114403026262966734}
-  _disableIfNoTitle: {fileID: 1545853871639352}
-  _descriptionText: {fileID: 114156967814840014}
-  _disableIfNoDescription: {fileID: 1881506723941104}
+  TitleText: {fileID: 114403026262966734}
+  DisableIfNoTitle: {fileID: 1545853871639352}
+  DisableIfNoDescription: {fileID: 1881506723941104}
+  DescriptionText: {fileID: 114156967814840014}
   _buttonPrefab: {fileID: 114419094787720486}
   _buttonParent: {fileID: 224731354708534632}
   _disableIfNoButtons: {fileID: 1559723187995158}
@@ -548,10 +560,10 @@ RectTransform:
   m_Father: {fileID: 224731354708534632}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 250.30347, y: -26.439795}
-  m_SizeDelta: {x: 57, y: 42.87959}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 250.30347, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224263524617918696
 RectTransform:
@@ -566,10 +578,10 @@ RectTransform:
   m_Father: {fileID: 224234525135076220}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 28.5, y: -21.439795}
-  m_SizeDelta: {x: 41, y: 42.87959}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224575609865307556
 RectTransform:
@@ -603,10 +615,10 @@ RectTransform:
   m_Father: {fileID: 224214640303183586}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 250.30347, y: -194.43723}
-  m_SizeDelta: {x: 500.60693, y: 52.87959}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224849465727053270
 RectTransform:
@@ -622,10 +634,10 @@ RectTransform:
   m_Father: {fileID: 224214640303183586}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 250.30347, y: -103.21763}
-  m_SizeDelta: {x: 500.60693, y: 129.55963}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224917282169589012
 RectTransform:
@@ -641,10 +653,10 @@ RectTransform:
   m_Father: {fileID: 224214640303183586}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 250.30347, y: -19.218906}
-  m_SizeDelta: {x: 500.60693, y: 38.437813}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224980610497148542
 RectTransform:

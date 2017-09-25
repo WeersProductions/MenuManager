@@ -12,7 +12,8 @@ namespace WeersProductions
         {
             UNDEFINED = -2,
             NONE = -1,
-            SIMPLEPOPUP = 0
+            SIMPLEPOPUP = 0,
+            SIMPLETOOLTIP = 1
         }
 
         /// <summary>
@@ -210,13 +211,14 @@ namespace WeersProductions
         /// </summary>
         /// <param name="id"></param>
         /// <param name="createWhenNoMenu"></param>
-        public static void AddPopup(Menus id, bool createWhenNoMenu)
+        /// <param name="data"></param>
+        public static void AddPopup(Menus id, bool createWhenNoMenu, object data = null)
         {
             if (id == Menus.NONE)
             {
                 return;
             }
-            AddPopup(GetPoolObject(id), createWhenNoMenu);
+            AddPopup(GetPoolObject(id), createWhenNoMenu, data);
         }
 
         /// <summary>
@@ -231,7 +233,9 @@ namespace WeersProductions
             {
                 if (menus.Count > 0)
                 {
-                    return menus.Dequeue();
+                    MCMenu dequeue = menus.Dequeue();
+                    dequeue.PrepareForPool();
+                    return dequeue;
                 }
             }
 

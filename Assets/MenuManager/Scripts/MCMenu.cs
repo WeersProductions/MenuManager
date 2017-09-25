@@ -37,6 +37,12 @@ namespace WeersProductions
         [SerializeField]
         private bool _shouldBePooled = true;
 
+        /// <summary>
+        /// TODO: implement this so that a menu can be always on top.
+        /// </summary>
+        [SerializeField]
+        private bool _alwaysOnTop;
+
         //TODO: Add pool amount if it should be pooled (E.G. max 5 objects).
 
         /// <summary>
@@ -109,6 +115,7 @@ namespace WeersProductions
         public virtual void Show(object data)
         {
             gameObject.SetActive(true);
+            gameObject.transform.SetAsLastSibling();
         }
 
         /// <summary>
@@ -203,6 +210,14 @@ namespace WeersProductions
                     }
                 });
             }
+        }
+
+        /// <summary>
+        /// After calling this, the object should be ready for reuse as if it was instantiated.
+        /// </summary>
+        public virtual void PrepareForPool()
+        {
+            
         }
 
 #if UNITY_EDITOR
