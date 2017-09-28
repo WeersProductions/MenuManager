@@ -99,7 +99,7 @@ namespace WeersProductions
                 if (canShow)
                 {
                     // Hide the current menu's and show this one.
-                    HideAllMenus();
+                    HideAllMenus(TODO);
                 }
                 else
                 {
@@ -120,12 +120,22 @@ namespace WeersProductions
         /// <summary>
         /// Hide all menus.
         /// </summary>
-        public static void HideAllMenus()
+        /// <param name="hideAll">If true it will set all children as inactive (it will not <see cref="HideMenu"/> them!) of the MenuController, even those that are not marked as active.</param>
+        public static void HideAllMenus(bool hideAll = false)
         {
             List<MCMenu> copy = new List<MCMenu>(_instance._activeMenus);
             for (int i = 0; i < copy.Count; i++)
             {
                 HideMenu(copy[i]);
+            }
+
+            if (hideAll)
+            {
+                MCMenu[] allMenus = _instance.GetComponentsInChildren<MCMenu>();
+                for (int i = 0; i < allMenus.Length; i++)
+                {
+                    allMenus[i].gameObject.SetActive(false);
+                }
             }
         }
 
