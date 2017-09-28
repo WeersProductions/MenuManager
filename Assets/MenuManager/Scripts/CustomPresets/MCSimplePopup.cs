@@ -8,6 +8,8 @@ using WeersProductions;
 
 namespace WeersProductions
 {
+    /// <inheritdoc cref="MCSimpleTooltip" />
+    /// <inheritdoc cref="IDraggableMenu"/>
     /// <summary>
     /// Adds buttons to the tooltip and makes it draggable.
     /// </summary>
@@ -69,7 +71,7 @@ namespace WeersProductions
 
         public void OnBeginDrag(PointerEventData eventData)
         {
-            Debug.Log("Show something visual");
+            // Show that we are dragging.
         }
 
         public void OnDrag(PointerEventData eventData)
@@ -79,9 +81,10 @@ namespace WeersProductions
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            Debug.Log("Stop the special visual");
+            // Stop showing that we are dragging.
         }
 
+        /// <inheritdoc />
         public override void PrepareForPool()
         {
             base.PrepareForPool();

@@ -12,7 +12,8 @@ namespace WeersProductions
 
         private void Awake()
         {
-            _owner = FindInParents<IDraggableMenu>(this.gameObject);
+            // Find our owner.
+            _owner = FindInParents<IDraggableMenu>(gameObject);
             if (_owner == null)
             {
                 Debug.Log("Could not find the correct IDraggableMenu as parent.");
@@ -35,6 +36,12 @@ namespace WeersProductions
             _owner.OnEndDrag(eventData);
         }
 
+        /// <summary>
+        /// Find a component in one of the parents.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="go">Starting node.</param>
+        /// <returns>Null if no component is found of type T</returns>
         public static T FindInParents<T>(GameObject go)
         {
             if (go == null) return default(T);

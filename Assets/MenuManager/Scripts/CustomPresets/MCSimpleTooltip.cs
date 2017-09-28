@@ -8,6 +8,11 @@ using WeersProductions;
 
 namespace WeersProductions
 {
+    /// <inheritdoc cref="MCMenu" />
+    /// <inheritdoc cref="IMouseInsideListener"/>
+    /// <summary>
+    /// A simple tooltip that can be controlled by any gameobject that has a <see cref="T:WeersProductions.MCToolTipOwner" />
+    /// </summary>
     public class MCSimpleTooltip : MCMenu, IMouseInsideListener
     {
         [SerializeField]

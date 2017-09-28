@@ -4,6 +4,10 @@ using UnityEngine.Events;
 
 namespace WeersProductions
 {
+    /// <inheritdoc />
+    /// <summary>
+    /// The base class for all menus/popups/tooltips. Should be used whenever creating a new one.
+    /// </summary>
     public class MCMenu : MonoBehaviour
     {
         /// <summary>
@@ -43,7 +47,7 @@ namespace WeersProductions
         [SerializeField]
         private bool _alwaysOnTop;
 
-        //TODO: Add pool amount if it should be pooled (E.G. max 5 objects).
+        //TODO: Add pool amount if it should be pooled (E.G. max 5 objects in pool).
 
         /// <summary>
         /// A list of popups that this menu owns.
@@ -112,6 +116,7 @@ namespace WeersProductions
         /// <summary>
         /// Called when this menu should be shown, can be used for animations.
         /// </summary>
+        /// <param name="data">Can be used to send extra data to the menu.</param>
         public virtual void Show(object data)
         {
             gameObject.SetActive(true);
@@ -213,14 +218,18 @@ namespace WeersProductions
         }
 
         /// <summary>
-        /// After calling this, the object should be ready for reuse as if it was instantiated.
+        /// After calling this, the object should be ready for reuse as if it was just instantiated.
         /// </summary>
         public virtual void PrepareForPool()
         {
-            
+
         }
 
 #if UNITY_EDITOR
+        /// <summary>
+        /// Used by the editor script, normally you do not want to set the id and therefore it's not available during run-time.
+        /// </summary>
+        /// <param name="menus"></param>
         public void SetId(MenuController.Menus menus)
         {
             _id = menus;
