@@ -1,9 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using WeersProductions;
-
-namespace WeersProductions
+﻿namespace WeersProductions
 {
     /// <summary>
     /// Simple interface used for E.G. tooltips and menus that listen to the mouse.
