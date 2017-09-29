@@ -99,7 +99,7 @@ namespace WeersProductions
                 if (canShow)
                 {
                     // Hide the current menu's and show this one.
-                    HideAllMenus(TODO);
+                    HideAllMenus();
                 }
                 else
                 {
