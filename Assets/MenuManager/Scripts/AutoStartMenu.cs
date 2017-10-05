@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using WeersProductions;
 
+/// <summary>
+/// Simple class used for prototyping.
+/// </summary>
 public class AutoStartMenu : MonoBehaviour
 {
     /// <summary>

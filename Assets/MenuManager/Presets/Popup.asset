@@ -13,5 +13,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _title: Popup
   _description: Simple popup with buttons
-  _presetObject: {fileID: 1957888441538466, guid: 376649429097f0349985a38bc2bb28bd,
+  _presetObject: {fileID: 1470376470015404, guid: 19c8cfbae2ce66f4a8cbafaea1a90429,
     type: 2}

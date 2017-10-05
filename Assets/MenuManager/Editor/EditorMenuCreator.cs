@@ -26,6 +26,8 @@ namespace WeersProductions
 
         private string _newFileName = "";
         private MenuCreatorPreset _currentSelectedPreset;
+        private Vector2 _scrollPositionPresetList;
+        private Vector2 _scrollPositionPresetDetail;
         #endregion
 
         #region Options
@@ -62,6 +64,9 @@ namespace WeersProductions
             _tabsBlock.Draw();
         }
 
+        /// <summary>
+        /// Draws the create menu panel.
+        /// </summary>
         private void DrawCreateMenu()
         {
             if (!CheckPresets())
@@ -95,27 +100,53 @@ namespace WeersProductions
             }
         }
 
+        /// <summary>
+        /// Called when the user wants to create a new menu.
+        /// </summary>
+        /// <param name="menuCreatorPreset"></param>
         private void CreateMenu(MenuCreatorPreset menuCreatorPreset)
         {
-            GameObject newMenu = Instantiate(menuCreatorPreset.PresetObject, _editorMenuCreatorSettings.MenuParent);
+            GameObject newMenu;
+            // Only instantiate an object if the user wants that according to the settings.
+            if (_editorMenuCreatorSettings.SpawnInScene)
+            {
+                newMenu = Instantiate(menuCreatorPreset.PresetObject, _editorMenuCreatorSettings.MenuParent);
+            }
+            else
+            {
+                newMenu = menuCreatorPreset.PresetObject;
+            }
+             
             MCMenu mcMenu = newMenu.GetComponentInChildren<MCMenu>();
             if (mcMenu)
             {
-                if (_editorMenuCreatorSettings.MenuController)
-                {
-                    if (_menuController == null)
-                    {
-                        _menuController = new SerializedObject(_editorMenuCreatorSettings.MenuController);
-                    }
-                    _menuController.Update();
-                    SerializedProperty menuArray = _menuController.FindProperty("_mcMenus");
-                    menuArray.arraySize += 1;
-                    menuArray.GetArrayElementAtIndex(menuArray.arraySize - 1).objectReferenceValue = mcMenu;
-                    _menuController.ApplyModifiedProperties();
-                }
+                AddMenuToController(mcMenu);
             }
         }
 
+        /// <summary>
+        /// Adds a new menu to the array of menus in the menucontroller.
+        /// </summary>
+        /// <param name="mcMenu"></param>
+        private void AddMenuToController(MCMenu mcMenu)
+        {
+            if (_editorMenuCreatorSettings.MenuController)
+            {
+                if (_menuController == null)
+                {
+                    _menuController = new SerializedObject(_editorMenuCreatorSettings.MenuController);
+                }
+                _menuController.Update();
+                SerializedProperty menuArray = _menuController.FindProperty("_mcMenus");
+                menuArray.arraySize += 1;
+                menuArray.GetArrayElementAtIndex(menuArray.arraySize - 1).objectReferenceValue = mcMenu;
+                _menuController.ApplyModifiedProperties();
+            }
+        }
+
+        /// <summary>
+        /// Draw the create preset panel.
+        /// </summary>
         private void DrawCreatePreset()
         {
             bool hasPresets = CheckPresets();
@@ -144,6 +175,9 @@ namespace WeersProductions
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 
+            GUILayout.Label("Preset list", EditorStyles.centeredGreyMiniLabel);
+
+            _scrollPositionPresetList = EditorGUILayout.BeginScrollView(_scrollPositionPresetList);
             for (int i = 0; i < _presets.Length; i++)
             {
                 GUILayout.BeginHorizontal();
@@ -153,12 +187,16 @@ namespace WeersProductions
                 }
                 GUILayout.EndHorizontal();
             }
+            EditorGUILayout.EndScrollView();
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 
+            GUILayout.Label("Preset detail", EditorStyles.centeredGreyMiniLabel);
+
             if (_currentSelectedPreset != null)
             {
+                _scrollPositionPresetDetail = EditorGUILayout.BeginScrollView(_scrollPositionPresetDetail);
                 Editor editor = Editor.CreateEditor(_currentSelectedPreset);
                 editor.DrawDefaultInspector();
 
@@ -173,9 +211,15 @@ namespace WeersProductions
                         mcEditor.DrawDefaultInspector();
                     }
                 }
+                EditorGUILayout.EndScrollView();
             }
         }
 
+        /// <summary>
+        /// Create a new preset.
+        /// </summary>
+        /// <param name="newFileName"></param>
+        /// <returns></returns>
         private MenuCreatorPreset CreatePreset(string newFileName)
         {
             // TODO: check if this file already exists.
@@ -196,12 +240,17 @@ namespace WeersProductions
             return menuCreatorPreset;
         }
 
+        /// <summary>
+        /// Draws the options panel.
+        /// </summary>
         private void DrawOptions()
         {
             _editorMenuCreatorSettings.MenuParent = (RectTransform)EditorGUILayout.ObjectField("Parent of new menus", _editorMenuCreatorSettings.MenuParent, typeof(RectTransform), true);
             _editorMenuCreatorSettings.DefaultPresetPath = EditorGUILayout.TextField("Preset location", _editorMenuCreatorSettings.DefaultPresetPath);
             _editorMenuCreatorSettings.MenuController = (MenuController)EditorGUILayout.ObjectField("Menu Controller",
                 _editorMenuCreatorSettings.MenuController, typeof(MenuController), true);
+            _editorMenuCreatorSettings.SpawnInScene =
+                EditorGUILayout.Toggle("Spawn in scene", _editorMenuCreatorSettings.SpawnInScene);
 
             if (GUI.changed)
             {
@@ -210,7 +259,7 @@ namespace WeersProductions
         }
 
         /// <summary>
-        /// 
+        /// Loads all presets of menus.
         /// </summary>
         /// <returns>True if it found any presets, false if not.</returns>
         private bool CheckPresets()
@@ -228,24 +277,32 @@ namespace WeersProductions
                 }
 
                 _presets = result.ToArray();
-                _presetTitles = new string[_presets.Length];
-                _presetDescriptions = new string[_presets.Length];
-                for (int i = 0; i < _presets.Length; i++)
-                {
-                    _presetTitles[i] = _presets[i].Title;
-                    _presetDescriptions[i] = _presets[i].Description;
-                }
-                return _presets.Length > 0;
             }
+
+            // Update tooltips and titles.
+            _presetTitles = new string[_presets.Length];
+            _presetDescriptions = new string[_presets.Length];
+            for (int i = 0; i < _presets.Length; i++)
+            {
+                _presetTitles[i] = _presets[i].Title;
+                _presetDescriptions[i] = _presets[i].Description;
+            }
+
             return _presets != null && _presets.Length > 0;
         }
 
+        /// <summary>
+        /// Will force a rebuild of the preset list.
+        /// </summary>
         private void UpdatePresetsList()
         {
             _presets = null;
             CheckPresets();
         }
 
+        /// <summary>
+        /// If no settings file exists, it will create one, otherwise it will use the existing one.
+        /// </summary>
         private void CreateOrLoadSettings()
         {
             EditorMenuCreatorSettings settingsAsset = (EditorMenuCreatorSettings)AssetDatabase.LoadAssetAtPath(EditorMenuCreatorSettings.SettingsPath, typeof(EditorMenuCreatorSettings));

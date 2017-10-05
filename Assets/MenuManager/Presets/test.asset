@@ -11,6 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aae7c8c894e357441ba8bc1351e92b4a, type: 3}
   m_Name: test
   m_EditorClassIdentifier: 
-  _title: asdf
-  _description: fdsa
-  _presetObject: {fileID: 0}
+  _title: Tooltip
+  _description: A simple tooltip
+  _presetObject: {fileID: 1987501103171940, guid: 26a0a6673dad3f641968ad60a527cf13,
+    type: 2}

@@ -6,6 +6,9 @@ using System.Linq;
 
 namespace WeersProductions
 {
+    /// <summary>
+    /// Credits to: https://www.assetstore.unity3d.com/en/#!/content/43321 
+    /// </summary>
     public class VerticalBlock : IDisposable
     {
         public VerticalBlock(params GUILayoutOption[] options)
@@ -24,6 +27,9 @@ namespace WeersProductions
         }
     }
 
+    /// <summary>
+    /// Credits to: https://www.assetstore.unity3d.com/en/#!/content/43321
+    /// </summary>
     public class ScrollviewBlock : IDisposable
     {
         public ScrollviewBlock(ref Vector2 scrollPos, params GUILayoutOption[] options)
@@ -37,6 +43,9 @@ namespace WeersProductions
         }
     }
 
+    /// <summary>
+    /// Credits to: https://www.assetstore.unity3d.com/en/#!/content/43321
+    /// </summary>
     public class HorizontalBlock : IDisposable
     {
         public HorizontalBlock(params GUILayoutOption[] options)
@@ -55,6 +64,9 @@ namespace WeersProductions
         }
     }
 
+    /// <summary>
+    /// Credits to: https://www.assetstore.unity3d.com/en/#!/content/43321
+    /// </summary>
     public class ColoredBlock : System.IDisposable
     {
         public ColoredBlock(Color color)
@@ -68,6 +80,9 @@ namespace WeersProductions
         }
     }
 
+    /// <summary>
+    /// Credits to: https://www.assetstore.unity3d.com/en/#!/content/43321
+    /// </summary>
     [Serializable]
     public class TabsBlock
     {
