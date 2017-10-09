@@ -53,6 +53,7 @@ namespace WeersProductions
 
             _tabsBlock = new TabsBlock(new Dictionary<string, Action>
         {
+            {"Initialize", DrawInitialize },
             {"Create menu", DrawCreateMenu },
             {"Create preset", DrawCreatePreset },
             {"Options", DrawOptions }
@@ -62,6 +63,65 @@ namespace WeersProductions
         void OnGUI()
         {
             _tabsBlock.Draw();
+        }
+
+        /// <summary>
+        /// Draws the initalize panel.
+        /// </summary>
+        private void DrawInitialize()
+        {
+            bool everythingIsPerfect = true;
+            if (!_editorMenuCreatorSettings.MenuController)
+            {
+                EditorGUILayout.HelpBox("The MenuController is not yet set, set it in the options manually or try the button below.", MessageType.Warning);
+                EditorGUILayout.BeginHorizontal();
+                if (GUILayout.Button("Search for MenuController"))
+                {
+                    MenuController menuController = GameObject.FindObjectOfType<MenuController>();
+
+                    if (menuController)
+                    {
+                        _editorMenuCreatorSettings.MenuController = menuController;
+
+                        EditorUtility.SetDirty(_editorMenuCreatorSettings);
+                    }
+                }
+                if (GUILayout.Button("Add MenuController component to first canvas"))
+                {
+                    Canvas firstCanvas = GameObject.FindObjectOfType<Canvas>();
+
+                    if (firstCanvas)
+                    {
+                        _editorMenuCreatorSettings.MenuController = firstCanvas.gameObject.AddComponent<MenuController>();
+
+                        EditorUtility.SetDirty(_editorMenuCreatorSettings);
+                    }
+                }
+                EditorGUILayout.EndHorizontal();
+
+                everythingIsPerfect = false;
+            }
+            if (!_editorMenuCreatorSettings.SpawnInScene && !_editorMenuCreatorSettings.MenuParent)
+            {
+                EditorGUILayout.HelpBox("The parent for the menus is not yet set, set it in the options manually or try the button below.", MessageType.Warning);
+                if (GUILayout.Button("Use first Canvas that's found"))
+                {
+                    Canvas menuParent = GameObject.FindObjectOfType<Canvas>();
+
+                    if (menuParent)
+                    {
+                        _editorMenuCreatorSettings.MenuParent = menuParent.GetComponent<RectTransform>();
+
+                        EditorUtility.SetDirty(_editorMenuCreatorSettings);
+                    }
+                }
+                everythingIsPerfect = false;
+            }
+
+            if (everythingIsPerfect)
+            {
+                EditorGUILayout.HelpBox("Seems like everything is fine! Enjoy ;)", MessageType.Info);
+            }
         }
 
         /// <summary>
@@ -116,7 +176,7 @@ namespace WeersProductions
             {
                 newMenu = menuCreatorPreset.PresetObject;
             }
-             
+
             MCMenu mcMenu = newMenu.GetComponentInChildren<MCMenu>();
             if (mcMenu)
             {

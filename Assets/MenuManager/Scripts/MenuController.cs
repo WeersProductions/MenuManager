@@ -24,7 +24,8 @@ namespace WeersProductions
         /// <summary>
         /// Used for editor only 
         /// </summary>
-        [SerializeField] private MCMenu[] _mcMenus;
+        [SerializeField]
+        private MCMenu[] _mcMenus;
 
         /// <summary>
         /// Used for faster lookup during runtime of menus with specified ids.
