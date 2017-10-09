@@ -1,33 +1,37 @@
 ﻿using UnityEngine;
-using WeersProductions;
 
-/// <summary>
-/// Simple class used for prototyping.
-/// </summary>
-public class AutoStartMenu : MonoBehaviour
+namespace WeersProductions
 {
+    /// <inheritdoc />
     /// <summary>
-    /// If true it will disable all other menus that are still active when starting the scene.
+    /// Simple class used for prototyping.
     /// </summary>
-    [SerializeField]
-    private bool _disableOthers;
-
-    /// <summary>
-    /// This menu will be shown at the start of the scene.
-    /// </summary>
-    [SerializeField]
-    private MenuController.Menus _startMenu;
-
-    private void Start()
+    public class AutoStartMenu : MonoBehaviour
     {
-        if (_disableOthers)
-        {
-            MenuController.HideAllMenus(true);
-        }
+        /// <summary>
+        /// If true it will disable all other menus that are still active when starting the scene.
+        /// </summary>
+        [SerializeField]
+        private bool _disableOthers;
 
-        if (_startMenu != MenuController.Menus.NONE && _startMenu != MenuController.Menus.UNDEFINED)
+        /// <summary>
+        /// This menu will be shown at the start of the scene.
+        /// </summary>
+        [SerializeField]
+        private MenuController.Menus _startMenu;
+
+        private void Start()
         {
-            MenuController.ShowMenu(_startMenu);
+            if (_disableOthers)
+            {
+                MenuController.HideAllMenus(true);
+            }
+
+            if (_startMenu != MenuController.Menus.NONE && _startMenu != MenuController.Menus.UNDEFINED)
+            {
+                MenuController.ShowMenu(_startMenu);
+            }
         }
     }
+
 }

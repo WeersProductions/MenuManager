@@ -457,10 +457,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _id: 0
+  _blockOutsideRaycasting: 1
   _fullscreen: 0
   _canBeClosed: 1
   _shouldBeQueued: 1
   _shouldBePooled: 1
+  _alwaysOnTop: 0
   TitleText: {fileID: 114403026262966734}
   DisableIfNoTitle: {fileID: 1545853871639352}
   DisableIfNoDescription: {fileID: 1881506723941104}

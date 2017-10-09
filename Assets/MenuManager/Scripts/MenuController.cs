@@ -43,18 +43,45 @@ namespace WeersProductions
 
         /// <summary>
         /// A queue of menus that want to be popupped up when another menu is closed.
-        /// This queue contains copy of the original menus, so you don't have to duplicate them anymore.
+        /// This queue contains copy of the original menus, so you don't have to duplicate (instantiate) them anymore.
         /// </summary>
         private readonly Queue<MenuQueueItem> _menuQueue = new Queue<MenuQueueItem>();
 
+        /// <summary>
+        /// A reference to the objec that checks clicking outside the menu.
+        /// </summary>
+        private NonDrawingGraphic _clickOutsideMenu;
+
         private void Awake()
         {
+            // Set the singleton reference.
             _instance = this;
 
+            // For faster referencing, convert the array to a dictionary for run-time use.
             for (int i = 0; i < _mcMenus.Length; i++)
             {
                 _menus.Add(_mcMenus[i].Id, _mcMenus[i]);
             }
+
+            // Create the object that checks clicking outside of the current menu.
+            _clickOutsideMenu = CreateOutsideMenuObject();
+        }
+
+        /// <summary>
+        /// Create the object that checks clicking outside of the current menu and disable it.
+        /// </summary>
+        /// <returns>The new component that is added to control it.</returns>
+        private NonDrawingGraphic CreateOutsideMenuObject()
+        {
+            GameObject outsideMenuGameObject = new GameObject("OutsideMenuClick", typeof(RectTransform));
+            RectTransform outsideMenuRect = outsideMenuGameObject.GetComponent<RectTransform>();
+            outsideMenuRect.SetParent(transform);
+            outsideMenuRect.anchoredPosition = Vector2.zero;
+            outsideMenuRect.sizeDelta = Vector2.zero;
+            outsideMenuRect.anchorMin = Vector2.zero;
+            outsideMenuRect.anchorMax = Vector2.one;
+            outsideMenuGameObject.SetActive(false);
+            return outsideMenuGameObject.AddComponent<NonDrawingGraphic>();
         }
 
         /// <summary>
@@ -64,7 +91,7 @@ namespace WeersProductions
         /// <param name="mcMenuData"></param>
         public static MCMenu ShowMenu(Menus id, object mcMenuData = null)
         {
-             return ShowMenu(GetPoolObject(id), mcMenuData);
+            return ShowMenu(GetPoolObject(id), mcMenuData);
         }
 
         /// <summary>
@@ -111,6 +138,7 @@ namespace WeersProductions
                 }
             }
 
+            _instance.InitializeOutsideClick(mcMenu);
             // We can show this one.
             mcMenu.Show(mcMenuData);
             _instance._activeMenus.Add(mcMenu);
@@ -156,9 +184,26 @@ namespace WeersProductions
         {
             if (_instance._activeMenus.Contains(mcMenu))
             {
+                _instance._clickOutsideMenu.gameObject.SetActive(false);
+
                 _instance._activeMenus.Remove(mcMenu);
                 // Only check the menu when we actually removed something.
-                CheckMenuQueue();
+                if (!CheckMenuQueue())
+                {
+                    // We did not activate a menu in the queue.
+                    _instance.InitializeOutsideClick();
+                }
+            }
+            else
+            {
+                if (mcMenu.Parent)
+                {
+                    _instance.InitializeOutsideClick(mcMenu.Parent);
+                }
+                else
+                {
+                    _instance.InitializeOutsideClick();
+                }
             }
 
             if (mcMenu.ShouldBePooled)
@@ -176,7 +221,8 @@ namespace WeersProductions
         /// <summary>
         /// Checks the queue of menus waiting to be activated and will activate them if possible.
         /// </summary>
-        private static void CheckMenuQueue()
+        /// <returns>True if a new menu is activated that was in the queue.</returns>
+        private static bool CheckMenuQueue()
         {
             if (_instance._activeMenus.Count <= 0)
             {
@@ -186,8 +232,10 @@ namespace WeersProductions
                     // There is a menu in the queue, let show it.
                     MenuQueueItem menuQueueItem = _instance._menuQueue.Dequeue();
                     ShowMenu(menuQueueItem.Menu, menuQueueItem.Data);
+                    return true;
                 }
             }
+            return false;
         }
 
         /// <summary>
@@ -201,6 +249,7 @@ namespace WeersProductions
         {
             if (_instance._activeMenus.Count > 0)
             {
+                _instance.InitializeOutsideClick(mcMenu);
                 _instance._activeMenus[0].AddPopup(mcMenu, data);
             }
             else
@@ -217,7 +266,7 @@ namespace WeersProductions
         }
 
         /// <summary>
-        /// A wrapper for <see cref="AddPopup(MCMenu,bool)"/>
+        /// A wrapper for <see cref="AddPopup(MCMenu,bool, object)"/>
         /// </summary>
         /// <param name="id"></param>
         /// <param name="createWhenNoMenu"></param>
@@ -229,6 +278,15 @@ namespace WeersProductions
                 return;
             }
             AddPopup(GetPoolObject(id), createWhenNoMenu, data);
+        }
+
+        /// <summary>
+        /// Called when a popup is added directly to the McMenu and will make sure the OutsideClick is correctly configured.
+        /// </summary>
+        /// <param name="mcMenu"></param>
+        public static void OnMenuAdded(MCMenu mcMenu)
+        {
+            _instance.InitializeOutsideClick(mcMenu);
         }
 
         /// <summary>
@@ -268,6 +326,49 @@ namespace WeersProductions
             }
 
             menus.Enqueue(menu);
+        }
+
+        /// <summary>
+        /// Prepare the OutsideClick object and put it in the right position in the heiarchy.
+        /// </summary>
+        /// <param name="mcMenu"></param>
+        private void InitializeOutsideClick(MCMenu mcMenu)
+        {
+            int siblingIndex = mcMenu.transform.GetSiblingIndex();
+            if (_clickOutsideMenu.transform.GetSiblingIndex() < siblingIndex)
+            {
+                siblingIndex--;
+            }
+            _clickOutsideMenu.transform.SetSiblingIndex(siblingIndex);
+            _clickOutsideMenu.OnClick = mcMenu.OnClickOutside;
+
+            _clickOutsideMenu.raycastTarget = mcMenu.BlockOutsideRaycasting;
+
+            _clickOutsideMenu.gameObject.SetActive(true);
+        }
+
+        /// <summary>
+        /// Will Initalize the outside click for the last activated menu that is still active.
+        /// </summary>
+        private void InitializeOutsideClick()
+        {
+            MCMenu lastActive = GetLastActive();
+            if (lastActive)
+            {
+                InitializeOutsideClick(lastActive);
+            }
+        }
+
+        /// <summary>
+        /// Returns the menu that was activated last and is still active now.
+        /// </summary>
+        private MCMenu GetLastActive()
+        {
+            if (_activeMenus.Count > 0)
+            {
+                return _activeMenus[_activeMenus.Count - 1];
+            }
+            return null;
         }
     }
 

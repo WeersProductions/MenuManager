@@ -17,6 +17,12 @@ namespace WeersProductions
         private MenuController.Menus _id;
 
         /// <summary>
+        /// If true clicking outside of the window will be blocked.
+        /// </summary>
+        [SerializeField]
+        private bool _blockOutsideRaycasting = true;
+
+        /// <summary>
         /// If true this menu wants the whole screen and thus cannot be shown next to another menu.
         /// </summary>
         [SerializeField]
@@ -114,6 +120,14 @@ namespace WeersProductions
         }
 
         /// <summary>
+        /// If true clicking outside of the window will be blocked.
+        /// </summary>
+        public bool BlockOutsideRaycasting
+        {
+            get { return _blockOutsideRaycasting; }
+        }
+
+        /// <summary>
         /// Called when this menu should be shown, can be used for animations.
         /// </summary>
         /// <param name="data">Can be used to send extra data to the menu.</param>
@@ -175,6 +189,8 @@ namespace WeersProductions
             PopupMenus.Add(mcMenu);
             mcMenu.Parent = this;
             mcMenu.Show(data);
+
+            MenuController.OnMenuAdded(mcMenu);
         }
 
         /// <summary>
@@ -223,6 +239,14 @@ namespace WeersProductions
         public virtual void PrepareForPool()
         {
 
+        }
+
+        /// <summary>
+        /// Called when the user presses outside this window.
+        /// </summary>
+        public virtual void OnClickOutside()
+        {
+            
         }
 
 #if UNITY_EDITOR

@@ -98,5 +98,10 @@ namespace WeersProductions
             }
             _buttonPrefab.gameObject.SetActive(true);
         }
+
+        public override void OnClickOutside()
+        {
+            Hide();
+        }
     }
 }
