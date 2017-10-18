@@ -371,6 +371,15 @@ namespace WeersProductions
             }
             return null;
         }
+
+        /// <summary>
+        /// Checks if any menus are currently active.
+        /// </summary>
+        /// <returns>True if any menu is active, false if no menu is active.</returns>
+        public static bool AnyMenuActive()
+        {
+            return _instance._activeMenus.Count > 0;
+        }
     }
 
     struct MenuQueueItem
