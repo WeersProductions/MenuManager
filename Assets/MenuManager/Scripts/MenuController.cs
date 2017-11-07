@@ -382,9 +382,18 @@ namespace WeersProductions
         }
     }
 
+    /// <summary>
+    /// Used when a menu needs to be put in queue, because it cannot be shown at the moment.
+    /// </summary>
     struct MenuQueueItem
     {
+        /// <summary>
+        /// The menu that is going to be shown.
+        /// </summary>
         private readonly MCMenu _mcMenu;
+        /// <summary>
+        /// Extra data that is passed to the Menu when it is activated.
+        /// </summary>
         private readonly object _data;
 
         public MenuQueueItem(MCMenu mcMenu, object data)
