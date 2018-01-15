@@ -246,7 +246,7 @@ namespace WeersProductions
         /// <param name="createWhenNoMenu">If true this popup will be made an active window in the case of no active windows at the time of calling this.
         /// If false, no popup will be shown if there is no active window.</param>
         /// <param name="data"></param>
-        public static void AddPopup(MCMenu mcMenu, bool createWhenNoMenu, object data = null)
+        public static MCMenu AddPopup(MCMenu mcMenu, bool createWhenNoMenu, object data = null)
         {
             if (_instance._activeMenus.Count > 0)
             {
@@ -259,11 +259,8 @@ namespace WeersProductions
                 {
                     ShowMenu(mcMenu, data);
                 }
-                else
-                {
-                    return;
-                }
             }
+            return mcMenu;
         }
 
         /// <summary>
@@ -272,13 +269,13 @@ namespace WeersProductions
         /// <param name="id"></param>
         /// <param name="createWhenNoMenu"></param>
         /// <param name="data"></param>
-        public static void AddPopup(Menus id, bool createWhenNoMenu, object data = null)
+        public static MCMenu AddPopup(Menus id, bool createWhenNoMenu, object data = null)
         {
             if (id == Menus.NONE)
             {
-                return;
+                return null;
             }
-            AddPopup(GetPoolObject(id), createWhenNoMenu, data);
+            return AddPopup(GetPoolObject(id), createWhenNoMenu, data);
         }
 
         /// <summary>
