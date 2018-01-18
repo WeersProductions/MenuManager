@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using Vuforia.EditorClasses;
+using Object = UnityEngine.Object;
 
 namespace WeersProductions
 {
@@ -20,6 +22,7 @@ namespace WeersProductions
         private string[] _presetDescriptions;
 
         private SerializedObject _menuController;
+        private bool _showMenuList;
         #endregion
 
         #region create preset
@@ -48,8 +51,6 @@ namespace WeersProductions
         {
             // Make sure we have an object to store our settings
             CreateOrLoadSettings();
-
-
 
             _tabsBlock = new TabsBlock(new Dictionary<string, Action>
         {
@@ -81,9 +82,7 @@ namespace WeersProductions
 
                     if (menuController)
                     {
-                        _editorMenuCreatorSettings.MenuController = menuController;
-
-                        EditorUtility.SetDirty(_editorMenuCreatorSettings);
+                        SetMenuController(menuController);
                     }
                 }
                 if (GUILayout.Button("Add MenuController component to first canvas"))
@@ -92,9 +91,7 @@ namespace WeersProductions
 
                     if (firstCanvas)
                     {
-                        _editorMenuCreatorSettings.MenuController = firstCanvas.gameObject.AddComponent<MenuController>();
-
-                        EditorUtility.SetDirty(_editorMenuCreatorSettings);
+                        SetMenuController(firstCanvas.gameObject.AddComponent<MenuController>());
                     }
                 }
                 EditorGUILayout.EndHorizontal();
@@ -158,6 +155,45 @@ namespace WeersProductions
                     CreateMenu(_presets[_selectedPreset]);
                 }
             }
+
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+            if (_menuController == null)
+            {
+                _menuController = new SerializedObject(_editorMenuCreatorSettings.MenuController);
+            }
+            EditorGUILayout.LabelField("Add existing menus");
+
+            DragDrop.DrawDragDrop("Drag menus to add them", objects =>
+            {
+                foreach (Object dropObject in objects)
+                {
+                    GameObject gameObject = dropObject as GameObject;
+                    if (gameObject)
+                    {
+                        MCMenu mcMenu = gameObject.GetComponentInChildren<MCMenu>();
+                        AddMenuToController(mcMenu);
+                    }
+                }
+            });
+
+            _showMenuList = EditorGUILayout.Foldout(_showMenuList, "Current menus");
+            if (_showMenuList)
+            {
+                _menuController.Update();
+                SerializedProperty arrayProperty = _menuController.FindProperty("_mcMenus");
+                for (int i = 0; i < arrayProperty.arraySize; i++)
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.PropertyField(arrayProperty.GetArrayElementAtIndex(i));
+                    if (GUILayout.Button("Remove"))
+                    {
+                        RemoveMenuFromController(i);
+                    }
+                    EditorGUILayout.EndHorizontal();
+                }
+                _menuController.ApplyModifiedProperties();
+            }
         }
 
         /// <summary>
@@ -200,6 +236,31 @@ namespace WeersProductions
                 SerializedProperty menuArray = _menuController.FindProperty("_mcMenus");
                 menuArray.arraySize += 1;
                 menuArray.GetArrayElementAtIndex(menuArray.arraySize - 1).objectReferenceValue = mcMenu;
+                _menuController.ApplyModifiedProperties();
+            }
+        }
+
+        /// <summary>
+        /// Remove a specific MCMenu from the list of menus from the current selected MenuController.
+        /// </summary>
+        /// <param name="index">Of the list</param>
+        private void RemoveMenuFromController(int index)
+        {
+            if (_editorMenuCreatorSettings.MenuController)
+            {
+                if (_menuController == null)
+                {
+                    _menuController = new SerializedObject(_editorMenuCreatorSettings.MenuController);
+                }
+                _menuController.Update();
+                SerializedProperty menuArray = _menuController.FindProperty("_mcMenus");
+                int arraySize = menuArray.arraySize;
+                menuArray.DeleteArrayElementAtIndex(index);
+                if (menuArray.arraySize == arraySize)
+                {
+                    // Hotfix, because of: https://answers.unity.com/questions/555724/serializedpropertydeletearrayelementatindex-leaves.html 
+                    menuArray.DeleteArrayElementAtIndex(index);
+                }
                 _menuController.ApplyModifiedProperties();
             }
         }
@@ -379,9 +440,20 @@ namespace WeersProductions
             if (!_editorMenuCreatorSettings.MenuController)
             {
                 MenuController menuController = FindObjectOfType<MenuController>();
-                _editorMenuCreatorSettings.MenuController = menuController;
-                EditorUtility.SetDirty(_editorMenuCreatorSettings);
+                SetMenuController(menuController);
             }
+
+            UpdatePresetsList();
+        }
+
+        /// <summary>
+        /// Set the menuController in the options. Will also save it.
+        /// </summary>
+        /// <param name="menuController"></param>
+        private void SetMenuController(MenuController menuController)
+        {
+            _editorMenuCreatorSettings.MenuController = menuController;
+            EditorUtility.SetDirty(_editorMenuCreatorSettings);
         }
     }
 }
