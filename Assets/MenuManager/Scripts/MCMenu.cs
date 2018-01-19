@@ -66,6 +66,11 @@ namespace WeersProductions
         /// </summary>
         private MCMenu _parent;
 
+        /// <summary>
+        /// If not null, called when the Menu is being hidden.
+        /// </summary>
+        private UnityAction _callBackHide;
+
         public MenuController.Menus Id
         {
             get { return _id; }
@@ -151,6 +156,11 @@ namespace WeersProductions
         /// <param name="afterHidden">A function that should be called when this menu is hidden.</param>
         public void Hide(UnityAction afterHidden)
         {
+            if (_callBackHide != null)
+            {
+                afterHidden += _callBackHide;
+            }
+
             // Remove all null values for popupMenus that are destroyed.
             PopupMenus.RemoveAll(menu => !menu);
 
@@ -167,6 +177,17 @@ namespace WeersProductions
                 OnHide(afterHidden);
                 });
             }
+        }
+
+        /// <summary>
+        /// Will add a callback when the screen is hidden and call it.
+        /// </summary>
+        /// <param name="action">The action that should be called when the menu is hidden.</param>
+        public void HideAndCall(UnityAction action)
+        {
+            _callBackHide = action;
+            Hide();
+            _callBackHide = null;
         }
 
         /// <summary>
