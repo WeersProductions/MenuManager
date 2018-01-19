@@ -160,6 +160,7 @@ namespace WeersProductions
             EditorGUILayout.Space();
             if (_menuController == null)
             {
+                EnsureSettingsObject();
                 _menuController = new SerializedObject(_editorMenuCreatorSettings.MenuController);
             }
             EditorGUILayout.LabelField("Add existing menus");
@@ -426,6 +427,26 @@ namespace WeersProductions
         /// </summary>
         private void CreateOrLoadSettings()
         {
+            EnsureSettingsObject();
+
+            if (!_editorMenuCreatorSettings.MenuController)
+            {
+                MenuController menuController = FindObjectOfType<MenuController>();
+                SetMenuController(menuController);
+            }
+
+            UpdatePresetsList();
+        }
+
+        /// <summary>
+        /// After calling this, you can be sure that <see cref="_editorMenuCreatorSettings"/> has a value.
+        /// </summary>
+        private void EnsureSettingsObject()
+        {
+            if (_editorMenuCreatorSettings)
+            {
+                return;
+            }
             EditorMenuCreatorSettings settingsAsset = (EditorMenuCreatorSettings)AssetDatabase.LoadAssetAtPath(EditorMenuCreatorSettings.SettingsPath, typeof(EditorMenuCreatorSettings));
             if (!settingsAsset)
             {
@@ -436,14 +457,6 @@ namespace WeersProductions
             }
 
             _editorMenuCreatorSettings = settingsAsset;
-
-            if (!_editorMenuCreatorSettings.MenuController)
-            {
-                MenuController menuController = FindObjectOfType<MenuController>();
-                SetMenuController(menuController);
-            }
-
-            UpdatePresetsList();
         }
 
         /// <summary>
