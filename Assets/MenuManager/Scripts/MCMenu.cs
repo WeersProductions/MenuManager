@@ -48,7 +48,8 @@ namespace WeersProductions
         private bool _shouldBePooled = true;
 
         /// <summary>
-        /// TODO: implement this so that a menu can be always on top.
+        /// If true, this screen will always be on top of the other screens.
+        /// Undefined behaviour if multiple screens have this true and are active at the same time.
         /// </summary>
         [SerializeField]
         private bool _alwaysOnTop;
@@ -91,6 +92,14 @@ namespace WeersProductions
         }
 
         /// <summary>
+        /// If true, a new menu will not be able to be shown unless this one is hidden.
+        /// </summary>
+        public bool ShouldBlockNewMenu
+        {
+            get { return !CanBeClosed && Fullscreen; }
+        }
+
+        /// <summary>
         /// If this is a popup menu, or a menu owned by another menu, the parent is not null.
         /// </summary>
         public MCMenu Parent
@@ -130,6 +139,15 @@ namespace WeersProductions
         public bool BlockOutsideRaycasting
         {
             get { return _blockOutsideRaycasting; }
+        }
+
+        /// <summary>
+        /// If true, this screen will always be on top of the other screens.
+        /// Undefined behaviour if multiple screens have this true and are active at the same time.
+        /// </summary>
+        public bool AlwaysOnTop
+        {
+            get { return _alwaysOnTop; }
         }
 
         /// <summary>

@@ -118,7 +118,7 @@ namespace WeersProductions
                 bool canShow = true;
                 for (int i = 0; i < _instance._activeMenus.Count; i++)
                 {
-                    if (!_instance._activeMenus[i].CanBeClosed)
+                    if (_instance._activeMenus[i].ShouldBlockNewMenu)
                     {
                         canShow = false;
                         break;
@@ -127,7 +127,7 @@ namespace WeersProductions
                 if (canShow)
                 {
                     // Hide the current menu's and show this one.
-                    HideAllMenus();
+                    HideAllBlockingMenus();
                 }
                 else
                 {
@@ -164,6 +164,21 @@ namespace WeersProductions
                 for (int i = 0; i < allMenus.Length; i++)
                 {
                     allMenus[i].gameObject.SetActive(false);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Will hide all menus that are blocking other menus from showing up.
+        /// </summary>
+        public static void HideAllBlockingMenus()
+        {
+            List<MCMenu> copy = new List<MCMenu>(_instance._activeMenus);
+            for (int i = 0; i < copy.Count; i++)
+            {
+                if (copy[i].ShouldBlockNewMenu)
+                {
+                    HideMenu(copy[i]);
                 }
             }
         }
@@ -306,7 +321,9 @@ namespace WeersProductions
             }
 
             // We could not find a poolObject, instantiate a new object.
-            return Instantiate(_instance._menus[menu], _instance.transform);
+            MCMenu mcMenu = Instantiate(_instance._menus[menu], _instance.transform);
+            mcMenu.gameObject.SetActive(false);
+            return mcMenu;
         }
 
         /// <summary>
