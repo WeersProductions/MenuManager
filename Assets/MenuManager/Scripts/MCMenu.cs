@@ -212,7 +212,8 @@ namespace WeersProductions
         /// Called when the Menu is being hidden.
         /// Only this menu will be hidden here, no popups or child menus are called in here.
         /// </summary>
-        /// <param name="afterHidden"></param>
+        /// <param name="afterHidden">Should be called when the menu is actually hidden. 
+        /// This means that when you have fade out animations, you should call this when the fade out is complete.</param>
         protected virtual void OnHide(UnityAction afterHidden)
         {
             gameObject.SetActive(false);

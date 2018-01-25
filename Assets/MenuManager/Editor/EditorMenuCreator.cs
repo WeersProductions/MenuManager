@@ -40,10 +40,45 @@ namespace WeersProductions
 
         #endregion
 
-        [MenuItem("WeersProductions/Create menu")]
+        [MenuItem("GameObject/WeersProductions/Add menu", false, 0)]
+        private static void AddMenu()
+        {
+            EditorMenuCreatorSettings settingsAsset = (EditorMenuCreatorSettings)AssetDatabase.LoadAssetAtPath(EditorMenuCreatorSettings.SettingsPath, typeof(EditorMenuCreatorSettings));
+            Transform parent = null;
+            if (settingsAsset && settingsAsset.MenuParent)
+            {
+                parent = settingsAsset.MenuParent;
+            }
+            else
+            {
+                Canvas menuParent = GameObject.FindObjectOfType<Canvas>();
+                if (menuParent)
+                {
+                    parent = menuParent.GetComponent<Transform>();
+                }
+            }
+
+            if (!parent)
+            {
+                Debug.LogError("Please add a Canvas to the scene.");
+                return;
+            }
+
+            GameObject newMenu = new GameObject("New menu");
+            Undo.RegisterCreatedObjectUndo(newMenu, "Create menu");
+            Undo.AddComponent<MCMenu>(newMenu);
+            
+            if (parent)
+            {
+                Undo.SetTransformParent(newMenu.GetComponent<Transform>(), parent, "Create menu");
+                EditorUtils.Collapse(parent.gameObject, true);
+            }
+        }
+
+        [MenuItem("Window/WeersProductions/MenuManager")]
         private static void Init()
         {
-            EditorMenuCreator editorMenuCreator = GetWindow<EditorMenuCreator>();
+            EditorMenuCreator editorMenuCreator = GetWindow<EditorMenuCreator>(false, "Menu Manager");
             editorMenuCreator.Show();
         }
 
@@ -98,7 +133,7 @@ namespace WeersProductions
 
                 everythingIsPerfect = false;
             }
-            if (!_editorMenuCreatorSettings.SpawnInScene && !_editorMenuCreatorSettings.MenuParent)
+            if (!_editorMenuCreatorSettings.MenuParent)
             {
                 EditorGUILayout.HelpBox("The parent for the menus is not yet set, set it in the options manually or try the button below.", MessageType.Warning);
                 if (GUILayout.Button("Use first Canvas that's found"))
@@ -203,16 +238,8 @@ namespace WeersProductions
         /// <param name="menuCreatorPreset"></param>
         private void CreateMenu(MenuCreatorPreset menuCreatorPreset)
         {
-            GameObject newMenu;
-            // Only instantiate an object if the user wants that according to the settings.
-            if (_editorMenuCreatorSettings.SpawnInScene)
-            {
-                newMenu = Instantiate(menuCreatorPreset.PresetObject, _editorMenuCreatorSettings.MenuParent);
-            }
-            else
-            {
-                newMenu = menuCreatorPreset.PresetObject;
-            }
+            GameObject newMenu = Instantiate(menuCreatorPreset.PresetObject, _editorMenuCreatorSettings.MenuParent);
+            Undo.RegisterCreatedObjectUndo(newMenu, "Created menu");
 
             MCMenu mcMenu = newMenu.GetComponentInChildren<MCMenu>();
             if (mcMenu)
@@ -371,8 +398,6 @@ namespace WeersProductions
             _editorMenuCreatorSettings.DefaultPresetPath = EditorGUILayout.TextField("Preset location", _editorMenuCreatorSettings.DefaultPresetPath);
             _editorMenuCreatorSettings.MenuController = (MenuController)EditorGUILayout.ObjectField("Menu Controller",
                 _editorMenuCreatorSettings.MenuController, typeof(MenuController), true);
-            _editorMenuCreatorSettings.SpawnInScene =
-                EditorGUILayout.Toggle("Spawn in scene", _editorMenuCreatorSettings.SpawnInScene);
 
             if (GUI.changed)
             {
