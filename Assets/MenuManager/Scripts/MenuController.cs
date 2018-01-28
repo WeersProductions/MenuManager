@@ -294,6 +294,22 @@ namespace WeersProductions
         }
 
         /// <summary>
+        /// Add a popup with an id to an existing menu.
+        /// </summary>
+        /// <param name="id">The id of the new popup.</param>
+        /// <param name="parent">The parent object that already exists.</param>
+        /// <param name="data">Data that should be passed on to the popup that is created.</param>
+        /// <returns></returns>
+        public static MCMenu AddPopup(Menus id, MCMenu parent, object data = null)
+        {
+            if (id == Menus.NONE)
+            {
+                return null;
+            }
+            return parent.AddPopup(GetPoolObject(id), data);
+        }
+
+        /// <summary>
         /// Called when a popup is added directly to the McMenu and will make sure the OutsideClick is correctly configured.
         /// </summary>
         /// <param name="mcMenu"></param>

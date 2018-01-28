@@ -223,14 +223,27 @@ namespace WeersProductions
         /// <summary>
         /// Add a popup to this menu and assign this menu as the parent for the popup.
         /// </summary>
-        /// <param name="mcMenu"></param>
-        public void AddPopup(MCMenu mcMenu, object data = null)
+        /// <param name="mcMenu">The new popup object.</param>
+        /// <param name="data">Data that is passed to the popup that is created.</param>
+        public MCMenu AddPopup(MCMenu mcMenu, object data = null)
         {
             PopupMenus.Add(mcMenu);
             mcMenu.Parent = this;
             mcMenu.Show(data);
 
             MenuController.OnMenuAdded(mcMenu);
+            return mcMenu;
+        }
+
+        /// <summary>
+        /// Add a popup to this menu.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="data">Data that is passed to the popup that is created.</param>
+        /// <returns>The new popup object.</returns>
+        public MCMenu AddPopup(MenuController.Menus id, object data = null)
+        {
+            return MenuController.AddPopup(id, this, data);
         }
 
         /// <summary>
@@ -242,6 +255,22 @@ namespace WeersProductions
             PopupMenus.Remove(mcMenu);
             mcMenu.Parent = null;
             mcMenu.Hide();
+        }
+
+        /// <summary>
+        /// Remove all popups with a certain Id from this menu.
+        /// </summary>
+        /// <param name="id"></param>
+        public void RemovePopup(MenuController.Menus id)
+        {
+            List<MCMenu> copy = new List<MCMenu>(PopupMenus);
+            for (int i = 0; i < copy.Count; i++)
+            {
+                if (copy[i].Id == id)
+                {
+                    RemovePopup(copy[i]);
+                }
+            }
         }
 
         /// <summary>
