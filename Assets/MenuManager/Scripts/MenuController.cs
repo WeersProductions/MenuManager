@@ -84,7 +84,7 @@ namespace WeersProductions
             outsideMenuGameObject.SetActive(false);
             return outsideMenuGameObject.AddComponent<NonDrawingGraphic>();
         }
-
+        
         /// <summary>
         /// Show a menu with a specific id.
         /// </summary>
@@ -163,7 +163,7 @@ namespace WeersProductions
                 MCMenu[] allMenus = _instance.GetComponentsInChildren<MCMenu>();
                 for (int i = 0; i < allMenus.Length; i++)
                 {
-                    allMenus[i].gameObject.SetActive(false);
+                    allMenus[i].SetState(false);
                 }
             }
         }
@@ -338,7 +338,7 @@ namespace WeersProductions
 
             // We could not find a poolObject, instantiate a new object.
             MCMenu mcMenu = Instantiate(_instance._menus[menu], _instance.transform);
-            mcMenu.gameObject.SetActive(false);
+            mcMenu.SetState(false);
             return mcMenu;
         }
 

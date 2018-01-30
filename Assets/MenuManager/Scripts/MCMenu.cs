@@ -8,8 +8,18 @@ namespace WeersProductions
     /// <summary>
     /// The base class for all menus/popups/tooltips. Should be used whenever creating a new one.
     /// </summary>
+    [RequireComponent(typeof(CanvasGroup))]
     public class MCMenu : MonoBehaviour
     {
+        /// <summary>
+        /// A reference to the canvasgroup that is on this component.
+        /// Instead of using SetActive, the alpha is set to 0/1 and blocksraycasts is set to false/true.
+        /// http://blog.gemserk.com/2017/07/20/our-tips-to-improve-unity-ui-performance-when-making-games-for-mobile-devices/ 
+        /// </summary>
+        [SerializeField]
+        [HideInInspector]
+        private CanvasGroup _canvasGroup;
+
         /// <summary>
         /// A unique id for this menu.
         /// </summary>
@@ -148,6 +158,7 @@ namespace WeersProductions
         public bool AlwaysOnTop
         {
             get { return _alwaysOnTop; }
+            set { _alwaysOnTop = value; }
         }
 
         /// <summary>
@@ -156,7 +167,7 @@ namespace WeersProductions
         /// <param name="data">Can be used to send extra data to the menu.</param>
         public virtual void Show(object data)
         {
-            gameObject.SetActive(true);
+            SetState(true);
             gameObject.transform.SetAsLastSibling();
         }
 
@@ -216,7 +227,7 @@ namespace WeersProductions
         /// This means that when you have fade out animations, you should call this when the fade out is complete.</param>
         protected virtual void OnHide(UnityAction afterHidden)
         {
-            gameObject.SetActive(false);
+            SetState(false);
             afterHidden();
         }
 
@@ -316,6 +327,32 @@ namespace WeersProductions
         public virtual void OnClickOutside()
         {
             
+        }
+
+        private void OnValidate()
+        {
+            _canvasGroup = GetComponent<CanvasGroup>();
+            if (!_canvasGroup)
+            {
+                // This is an old menu that does not have the canvasgroup yet.
+                Debug.LogError(string.Format("Please add a CanvasGroup to {0}. From now on CanvasGroups are used to activate/deactivate the menus.", this.name));
+            }
+        }
+
+        /// <summary>
+        /// Sets the object active or not. Will use the canvasgroup to hide the menu.
+        /// Is called by MenuController when hiding/showing menus.
+        /// </summary>
+        /// <param name="active"></param>
+        public void SetState(bool active)
+        {
+            if (!_canvasGroup)
+            {
+                // This is an old menu that does not have the canvasgroup assigned yet.
+                _canvasGroup = GetComponent<CanvasGroup>();
+            }
+            _canvasGroup.alpha = active ? 1 : 0;
+            _canvasGroup.blocksRaycasts = active;
         }
 
 #if UNITY_EDITOR
