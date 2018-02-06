@@ -12,5 +12,4 @@ MonoBehaviour:
   m_Name: Settings
   m_EditorClassIdentifier: 
   MenuParent: {fileID: 0}
-  DefaultPresetPath: /MenuManager/Presets/
   MenuController: {fileID: 0}
