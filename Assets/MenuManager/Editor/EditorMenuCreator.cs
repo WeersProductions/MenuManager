@@ -67,6 +67,7 @@ namespace WeersProductions
             GameObject newMenu = new GameObject("New menu");
             Undo.RegisterCreatedObjectUndo(newMenu, "Create menu");
             Undo.AddComponent<MCMenu>(newMenu);
+            Undo.AddComponent<RectTransform>(newMenu);
 
             if (parent)
             {
