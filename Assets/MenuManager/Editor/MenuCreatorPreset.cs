@@ -15,6 +15,7 @@ namespace WeersProductions
         public string Title
         {
             get { return _title; }
+            set { _title = value; }
         }
 
         public string Description

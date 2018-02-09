@@ -13,3 +13,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MenuParent: {fileID: 0}
   MenuController: {fileID: 0}
+  HasCustomPresetFolder: 0
+  CustomPresetFolder: 

@@ -10,20 +10,9 @@ namespace WeersProductions
 {
     public class EditorMenuCreator : EditorWindow
     {
-        /// <summary>
-        /// Used to check what the user is currently setting in the editor for the set-up.
-        /// </summary>
-        private enum InitializeState
-        {
-            NONE,
-            EDITOR_SETTINGS_DIRECTORY
-        }
-
         #region variables
 
         private TabsBlock _tabsBlock;
-
-        private InitializeState _initializeState = InitializeState.NONE;
 
         #region create menu
 
@@ -54,7 +43,7 @@ namespace WeersProductions
         [MenuItem("GameObject/WeersProductions/Add menu", false, 0)]
         private static void AddMenu()
         {
-            EditorMenuCreatorSettings settingsAsset = (EditorMenuCreatorSettings)AssetDatabase.LoadAssetAtPath(EditorMenuCreatorSettings.SettingsPathWithAssets, typeof(EditorMenuCreatorSettings));
+            EditorMenuCreatorSettings settingsAsset = EditorMenuCreatorSettings.GetEditorMenuCreatorSettings();
             Transform parent = null;
             if (settingsAsset && settingsAsset.MenuParent)
             {
@@ -90,77 +79,32 @@ namespace WeersProductions
         private static void Init()
         {
             EditorMenuCreator editorMenuCreator = GetWindow<EditorMenuCreator>(false, "Menu Manager");
+            editorMenuCreator.CreateOrLoadSettings();
             editorMenuCreator.Show();
         }
 
         private void OnEnable()
         {
-            // Make sure we have an object to store our settings
-            CreateOrLoadSettings();
+            //// Make sure we have an object to store our settings
+            //CreateOrLoadSettings();
 
             _tabsBlock = new TabsBlock(new Dictionary<string, Action>
+            {
+                {"Initialize", DrawInitialize },
+                {"Create menu", DrawCreateMenu },
+                {"Create preset", DrawCreatePreset },
+                {"Options", DrawOptions }
+            });
+        }
+
+        private void OnFocus()
         {
-            {"Initialize", DrawInitialize },
-            {"Create menu", DrawCreateMenu },
-            {"Create preset", DrawCreatePreset },
-            {"Options", DrawOptions }
-        });
+            CreateOrLoadSettings();
         }
 
         void OnGUI()
         {
-            CheckPaths();
-            if (_initializeState != InitializeState.NONE)
-            {
-                DrawFixPaths();
-                return;
-            }
-
             _tabsBlock.Draw();
-        }
-
-        /// <summary>
-        /// Checks whether the user has correctly set up the environment and all directories are correctly created.
-        /// </summary>
-        private void CheckPaths()
-        {
-            if (_initializeState != InitializeState.NONE)
-            {
-                return;
-            }
-            bool settingsExists = Directory.Exists(EditorMenuCreatorSettings.SettingsPathDirectories);
-            if (!settingsExists)
-            {
-                _initializeState = InitializeState.EDITOR_SETTINGS_DIRECTORY;
-                return;
-            }
-
-            Directory.CreateDirectory(EditorMenuCreatorSettings.DefaultPresetPathFull);
-        }
-
-        /// <summary>
-        /// The screen where the user can set the paths for both the settings and presets. Will be shown if some directories don't exist in the user's project.
-        /// </summary>
-        private void DrawFixPaths()
-        {
-            GUILayout.BeginHorizontal("box");
-            EditorGUILayout.LabelField("Set-up", EditorStyles.centeredGreyMiniLabel);
-            GUILayout.EndHorizontal();
-
-            EditorGUILayout.Space();
-
-            if (_initializeState == InitializeState.EDITOR_SETTINGS_DIRECTORY)
-            {
-                EditorGUILayout.HelpBox("The MenuManager needs a file to save its settings, the directory does not seem to exist that is required.", MessageType.Warning);
-                EditorMenuCreatorSettings.SettingsPath = EditorGUILayout.TextField("Settings path", EditorMenuCreatorSettings.SettingsPath);
-                EditorGUILayout.LabelField("Full path: " + EditorMenuCreatorSettings.SettingsPathDirectories);
-                if (GUILayout.Button("Confirm") && !string.IsNullOrEmpty(EditorMenuCreatorSettings.SettingsPath))
-                {
-                    Directory.CreateDirectory(EditorMenuCreatorSettings.SettingsPathDirectories);
-                    _initializeState = InitializeState.NONE;
-                }
-                return;
-            }
         }
 
         /// <summary>
@@ -255,10 +199,16 @@ namespace WeersProductions
             }
 
             EditorGUILayout.Space();
+            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
             EditorGUILayout.Space();
             if (_menuController == null)
             {
                 EnsureSettingsObject();
+                if (!_editorMenuCreatorSettings.MenuController)
+                {
+                    EditorGUILayout.HelpBox("You do not have set the MenuController yet, you can do this in the first tab. This will allow you to control all your menus here.", MessageType.Info);
+                    return;
+                }
                 _menuController = new SerializedObject(_editorMenuCreatorSettings.MenuController);
             }
             EditorGUILayout.LabelField("Add existing menus");
@@ -439,13 +389,15 @@ namespace WeersProductions
             {
                 CreatePreset("newPreset");
             }
-            string path = string.Format("assets{0}{1}.asset", EditorMenuCreatorSettings.DefaultPresetPathFull, newFileName);
+            string path = string.Format("{0}/{1}.asset", EditorMenuCreatorSettings.GetPresetsLocation(), newFileName);
+            Debug.Log("Creating at: " + path);
             if (AssetDatabase.LoadAssetAtPath(path, typeof(MenuCreatorPreset)))
             {
                 CreatePreset(newFileName + "_");
             }
 
             MenuCreatorPreset menuCreatorPreset = CreateInstance<MenuCreatorPreset>();
+            menuCreatorPreset.Title = newFileName;
             AssetDatabase.CreateAsset(menuCreatorPreset, path);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -475,17 +427,7 @@ namespace WeersProductions
         {
             if (_presets == null)
             {
-                List<MenuCreatorPreset> result = new List<MenuCreatorPreset>();
-
-                string[] aMaterialFiles = Directory.GetFiles(EditorMenuCreatorSettings.DefaultPresetPathFull, "*.asset", SearchOption.AllDirectories);
-                foreach (string matFile in aMaterialFiles)
-                {
-                    string assetPath = string.Format("Assets{0}", matFile.Replace(Application.dataPath, "").Replace('\\', '/'));
-                    MenuCreatorPreset menuCreatorPreset = AssetDatabase.LoadAssetAtPath<MenuCreatorPreset>(assetPath);
-                    result.Add(menuCreatorPreset);
-                }
-
-                _presets = result.ToArray();
+                _presets = EditorMenuCreatorSettings.GetAllPresets();
             }
 
             // Update tooltips and titles.
@@ -514,11 +456,6 @@ namespace WeersProductions
         /// </summary>
         private void CreateOrLoadSettings()
         {
-            CheckPaths();
-            if (_initializeState != InitializeState.NONE)
-            {
-                return;
-            }
             EnsureSettingsObject();
 
             if (!_editorMenuCreatorSettings.MenuController)
@@ -539,14 +476,7 @@ namespace WeersProductions
             {
                 return;
             }
-            EditorMenuCreatorSettings settingsAsset = (EditorMenuCreatorSettings)AssetDatabase.LoadAssetAtPath(EditorMenuCreatorSettings.SettingsPathWithAssets, typeof(EditorMenuCreatorSettings));
-            if (!settingsAsset)
-            {
-                settingsAsset = CreateInstance<EditorMenuCreatorSettings>();
-                AssetDatabase.CreateAsset(settingsAsset, EditorMenuCreatorSettings.SettingsPathWithAssets);
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
-            }
+            EditorMenuCreatorSettings settingsAsset = EditorMenuCreatorSettings.GetEditorMenuCreatorSettings();
 
             _editorMenuCreatorSettings = settingsAsset;
         }
