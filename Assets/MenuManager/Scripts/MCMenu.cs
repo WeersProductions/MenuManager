@@ -82,6 +82,11 @@ namespace WeersProductions
         /// </summary>
         private UnityAction _callBackHide;
 
+        /// <summary>
+        /// If true this screen is active and visible.
+        /// </summary>
+        private bool _isActive;
+
         public MenuController.Menus Id
         {
             get { return _id; }
@@ -353,6 +358,7 @@ namespace WeersProductions
             }
             _canvasGroup.alpha = active ? 1 : 0;
             _canvasGroup.blocksRaycasts = active;
+            _isActive = active;
         }
 
 #if UNITY_EDITOR
