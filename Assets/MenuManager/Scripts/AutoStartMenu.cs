@@ -24,12 +24,12 @@ namespace WeersProductions
         {
             if (_disableOthers)
             {
-                MenuController.HideAllMenus(true);
+                MenuController.HideAllMenusGlobal(true);
             }
 
             if (_startMenu != MenuController.Menus.NONE && _startMenu != MenuController.Menus.UNDEFINED)
             {
-                MenuController.ShowMenu(_startMenu);
+                MenuController.ShowMenuGlobal(_startMenu);
             }
         }
     }

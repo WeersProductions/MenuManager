@@ -16,7 +16,7 @@ namespace WeersProductions
         private void CreatePopup(int count, MCMenu parent)
         {
             // Get the Menu object, we need this because we have a button that closes the menu.
-            MCMenu popupMenu = MenuController.GetMenu(MenuController.Menus.SIMPLEPOPUP);
+            MCMenu popupMenu = MenuController.GetMenuGlobal(MenuController.Menus.SIMPLEPOPUP);
 
             // Create the data for the menu.
             MCSimplePopupData simplePopupData = new MCSimplePopupData("title " + count, "This is another popup.",
@@ -24,12 +24,12 @@ namespace WeersProductions
                 {
                     button => { CreatePopup(count + 1, popupMenu); },
                     button => popupMenu.Hide(),
-                    button => { MenuController.HideMenu(popupMenu.Parent); },
+                    button => { MenuController.HideMenuGlobal(popupMenu.Parent); },
                     button =>
                     {
                         MCSimpleTooltipData simpleTooltipData = new MCSimpleTooltipData("Tooltip", "More text",
                             button.GetComponent<RectTransform>()) {AutoRemove = true};
-                        MenuController.AddPopup(MenuController.Menus.SIMPLETOOLTIP, false, simpleTooltipData);
+                        MenuController.AddPopupGlobal(MenuController.Menus.SIMPLETOOLTIP, false, simpleTooltipData);
                     }
                 }, new[]
                 {
@@ -46,7 +46,7 @@ namespace WeersProductions
             else
             {
                 // Add the popup to the screen, when there is nothing on the screen it will be added as a menu instead of a popup. 
-                MenuController.AddPopup(popupMenu, true, simplePopupData);
+                MenuController.AddPopupGlobal(popupMenu, true, simplePopupData);
             }
         }
     }

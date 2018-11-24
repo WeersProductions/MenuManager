@@ -78,6 +78,11 @@ namespace WeersProductions
         private MCMenu _parent;
 
         /// <summary>
+        /// The MenuController that is controlling this menu.
+        /// </summary>
+        private MenuController _menuController;
+
+        /// <summary>
         /// If not null, called when the Menu is being hidden.
         /// </summary>
         private UnityAction _callBackHide;
@@ -120,7 +125,21 @@ namespace WeersProductions
         public MCMenu Parent
         {
             get { return _parent; }
-            set { _parent = value; }
+            set {
+                _parent = value; 
+                if (!_menuController) {
+                    SetMenuController(_parent.MenuController);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The MenuController that owns this menu.
+        /// </summary>
+        /// <value></value>
+        public MenuController MenuController
+        {
+            get { return _menuController; }
         }
 
         /// <summary>
@@ -175,13 +194,25 @@ namespace WeersProductions
             SetState(true);
             gameObject.transform.SetAsLastSibling();
         }
+        
+        /// <summary>
+        /// Sets the current MenuController of this menu.
+        /// </summary>
+        /// <param name="menuController">The controller that owns this menu.</param>
+        public void SetMenuController(MenuController menuController) 
+        {
+            if (!_menuController) 
+            {
+                _menuController = menuController;
+            }
+        }
 
         /// <summary>
         /// A simple wrapper that will call <see cref="MenuController.HideMenu"/> for itself.
         /// </summary>
         public void Hide()
         {
-            MenuController.HideMenu(this);
+            _menuController.HideMenu(this);
         }
 
         /// <summary>
@@ -247,7 +278,7 @@ namespace WeersProductions
             mcMenu.Parent = this;
             mcMenu.Show(data);
 
-            MenuController.OnMenuAdded(mcMenu);
+            _menuController.OnMenuAdded(mcMenu);
             return mcMenu;
         }
 
@@ -259,7 +290,7 @@ namespace WeersProductions
         /// <returns>The new popup object.</returns>
         public MCMenu AddPopup(MenuController.Menus id, object data = null)
         {
-            return MenuController.AddPopup(id, this, data);
+            return _menuController.AddPopup(id, this, data);
         }
 
         /// <summary>
