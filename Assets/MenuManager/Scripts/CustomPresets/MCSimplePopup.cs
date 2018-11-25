@@ -38,30 +38,46 @@ namespace WeersProductions
                 throw new Exception("Trying to show a simple popup, but using the wrong data type: " + data.GetType());
             }
             
-            bool hasButtons = simplePopupData.ButtonActions !=  null && simplePopupData.ButtonActions.Length > 0;
+            bool hasButtons = simplePopupData.ButtonDatas !=  null && simplePopupData.ButtonDatas.Length > 0;
             _disableIfNoButtons.SetActive(hasButtons);
-            if (hasButtons)
-            {
-                for (int i = 0; i < simplePopupData.ButtonActions.Length; i++)
+            for (int i = 0; i < simplePopupData.ButtonDatas.Length; i++)
+            {   
+                Button newButton = Instantiate(_buttonPrefab, _buttonParent);
+                newButton.onClick.RemoveAllListeners();
+                MCButtonData buttonData = simplePopupData.ButtonDatas[i];
+                if (buttonData.ButtonClick != null) 
                 {
-                    Button newButton = Instantiate(_buttonPrefab, _buttonParent);
-                    newButton.onClick.RemoveAllListeners();
-                    var numberIndex = i;
-                    newButton.onClick.AddListener(() => simplePopupData.ButtonActions[numberIndex](newButton));
-
-                    if (simplePopupData.ButtonSprites != null && simplePopupData.ButtonSprites.Length > i)
-                    {
-                        Image imageChild = newButton.GetComponentInChildren<Image>();
-                        imageChild.sprite = simplePopupData.ButtonSprites[i];
-                    }
-                    else
-                    {
-                        Text textChild = newButton.GetComponentInChildren<Text>();
-                        textChild.text = simplePopupData.ButtonStrings[i];
-                    }
-
-                    newButton.gameObject.SetActive(true);
+                    newButton.onClick.AddListener(() => buttonData.ButtonClick(newButton));
                 }
+
+                if (buttonData.Icon != null)
+                {
+                    Image imageChild = newButton.GetComponentInChildren<Image>();
+                    imageChild.sprite = buttonData.Icon;
+                }
+                else
+                {
+                    Text textChild = newButton.GetComponentInChildren<Text>();
+                    textChild.text = buttonData.Text;
+                }
+
+                if (buttonData.Tooltip) 
+                {
+                    MCSimpleTooltipData simpleTooltipData = new MCSimpleTooltipData("Tooltip", buttonData.TooltipText,
+                    newButton.GetComponent<RectTransform>()) {AutoRemove = true};
+
+                    OnHover onHover = newButton.GetComponent<OnHover>();
+                    if(!onHover) 
+                    {
+                        onHover = newButton.gameObject.AddComponent<OnHover>();
+                    }
+                    onHover.Delay = 1;
+                    onHover.onPointerDelay += () => {
+                        MenuController.AddPopupGlobal(MenuController.Menus.SIMPLETOOLTIP, false, simpleTooltipData);
+                    };
+                }
+
+                newButton.gameObject.SetActive(true);
             }
 
             _buttonPrefab.gameObject.SetActive(false);

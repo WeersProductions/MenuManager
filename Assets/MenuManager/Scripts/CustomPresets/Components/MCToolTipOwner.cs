@@ -10,7 +10,7 @@ namespace WeersProductions
     /// A very simple class that is used to 'own' tooltips during run-time.
     /// Everytime a tooltip is spawned this component is used to determine whether the mouse is still selecting the correct object.
     /// </summary>
-    public class MCToolTipOwner : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+    public class MCToolTipOwner : MonoBehaviour, IPointerExitHandler
     {
         private IMouseInsideListener _insideListener;
         private bool _inside;
@@ -33,11 +33,6 @@ namespace WeersProductions
         {
             get { return _inside; }
             set { _inside = value; }
-        }
-
-        public void OnPointerEnter(PointerEventData eventData)
-        {
-            _inside = true;
         }
 
         public void OnPointerExit(PointerEventData eventData)

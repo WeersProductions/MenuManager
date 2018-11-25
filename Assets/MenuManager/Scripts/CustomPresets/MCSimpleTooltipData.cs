@@ -9,11 +9,21 @@ namespace WeersProductions
         protected string _title;
 
         /// <summary>
-        ///     If true this data has custom position information that should be used.
+        /// If true this data has custom position information that should be used.
         /// </summary>
         public readonly bool HasCustomPosition;
 
-        public readonly Vector2 Position;
+        /// <summary>
+        /// Returns the position of the tooltip in relation with its owner.
+        /// </summary>
+        /// <value></value>
+        public Vector2 Position
+        {
+            get
+            {
+                return GetPosition(ToolTipOwner);
+            }
+        }
 
         public readonly RectTransform ToolTipOwner;
 
@@ -28,10 +38,9 @@ namespace WeersProductions
             _description = description;
         }
 
-        public MCSimpleTooltipData(string title, string description, RectTransform aObject) : this(title, description)
+        public MCSimpleTooltipData(string title, string description, RectTransform toBeFollowed) : this(title, description)
         {
-            ToolTipOwner = aObject;
-            Position = GetPosition(aObject);
+            ToolTipOwner = toBeFollowed;
             HasCustomPosition = true;
         }
 
