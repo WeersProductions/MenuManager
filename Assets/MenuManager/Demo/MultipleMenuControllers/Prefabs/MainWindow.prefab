@@ -40,6 +40,7 @@ GameObject:
   - component: {fileID: 222419429127373858}
   - component: {fileID: 114146180781482678}
   - component: {fileID: 114913737379365410}
+  - component: {fileID: 114316402024001388}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -364,6 +365,20 @@ MonoBehaviour:
   _shouldBeQueued: 0
   _shouldBePooled: 1
   _alwaysOnTop: 0
+--- !u!114 &114316402024001388
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1115969382918510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f99c09fef9ab4979aeb9e7f8b702f4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _menuController: {fileID: 0}
+  _tooltipText: This is the first button
+  _tooltipDelay: 1
 --- !u!114 &114425699733691586
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -12,7 +12,7 @@ namespace WeersProductions
 		public OnPointerEvent onPointerEnter;
 		public OnPointerEvent onPointerExit;
 		/// <summary>
-		/// Called after <see Delay/> time is over and the mouse is still hovering on the object.
+		/// Called after <see cref="Delay"/> time is over and the mouse is still hovering on the object.
 		/// </summary>
 		public UnityAction onPointerDelay;
 
@@ -29,7 +29,7 @@ namespace WeersProductions
 
 		/// <summary>
 		/// Called when the pointer enters this object.
-		/// If <see onPointerEnter/> has been set, it will be called.
+		/// If <see cref="onPointerEnter"/> has been set, it will be called.
 		/// </summary>
 		/// <param name="eventData"></param>
 		public void OnPointerEnter(PointerEventData eventData)
@@ -56,7 +56,7 @@ namespace WeersProductions
 
 		/// <summary>
 		/// Called when the pointer leaves this object.
-		/// If <see onPointerLeave/> has been set, it will be called.
+		/// If < onPointerLeave/> has been set, it will be called.
 		/// </summary>
 		/// <param name="eventData"></param>
 		public void OnPointerExit(PointerEventData eventData)

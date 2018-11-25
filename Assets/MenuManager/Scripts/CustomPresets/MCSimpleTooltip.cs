@@ -12,6 +12,7 @@ namespace WeersProductions
     /// <inheritdoc cref="IMouseInsideListener"/>
     /// <summary>
     /// A simple tooltip that can be controlled by any gameobject that has a <see cref="T:WeersProductions.MCToolTipOwner" />
+    /// TODO: add support for canvas in world space.
     /// </summary>
     public class MCSimpleTooltip : MCMenu, IMouseInsideListener
     {
@@ -62,7 +63,7 @@ namespace WeersProductions
                     throw new Exception("No RectTransform could be found on this tooltip!");
                 }
 
-                if(_updatePosition == null) 
+                if(_updatePosition == null)
                 {
                     _updatePosition = StartCoroutine(UpdatePosition(rectTransform));
                 }

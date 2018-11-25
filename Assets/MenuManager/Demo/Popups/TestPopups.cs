@@ -27,24 +27,6 @@ namespace WeersProductions
                     new MCButtonData("Close parent", button => { MenuController.HideMenuGlobal(popupMenu.Parent); }, null, true, "Closes the parent menu (which will close all children)"),
                     new MCButtonData("Close this", button => popupMenu.Hide(), null, true, "Closes this popup")
                 });
-                // new MCSimplePopupData.ButtonClick[]
-                // {
-                //     button => { CreatePopup(count + 1, popupMenu); },
-                //     button => popupMenu.Hide(),
-                //     button => { MenuController.HideMenuGlobal(popupMenu.Parent); },
-                //     button =>
-                //     {
-                //         MCSimpleTooltipData simpleTooltipData = new MCSimpleTooltipData("Tooltip", "More text",
-                //             button.GetComponent<RectTransform>()) {AutoRemove = true};
-                //         MenuController.AddPopupGlobal(MenuController.Menus.SIMPLETOOLTIP, false, simpleTooltipData);
-                //     }
-                // }, new[]
-                // {
-                //     "New popup",
-                //     "Close this",
-                //     "Close parent",
-                //     "Tooltip"
-                // });
 
             if (parent)
             {

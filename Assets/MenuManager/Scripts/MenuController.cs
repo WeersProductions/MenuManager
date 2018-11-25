@@ -285,7 +285,13 @@ namespace WeersProductions
             }
 
             // We could not find a poolObject, instantiate a new object.
-            MCMenu mcMenu = Instantiate(_menus[menu], transform);
+            MCMenu menuObject;
+            if(!_menus.TryGetValue(menu, out menuObject))
+            {
+                Debug.LogError("Trying to show a menu that is not added to this MenuController: " + menu);
+                return null;
+            }
+            MCMenu mcMenu = Instantiate(menuObject, transform);
             mcMenu.SetState(false);
             return mcMenu;
         }
