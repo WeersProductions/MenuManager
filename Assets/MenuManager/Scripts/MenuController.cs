@@ -18,7 +18,7 @@ namespace WeersProductions
             NONE = -1,
             SIMPLEPOPUP = 0,
             SIMPLETOOLTIP = 1,
-            GAMEWINDOW = 2,
+            GENERALWINDOW = 2,
             GAMEMENU = 3
         }
 
