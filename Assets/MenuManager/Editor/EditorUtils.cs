@@ -11,7 +11,7 @@ namespace WeersProductions
             // bail out immediately if the go doesn't have children
             if (go.transform.childCount == 0) return;
             // get a reference to the hierarchy window
-            var hierarchy = GetFocusedWindow("Hierarchy");
+            var hierarchy = GetFocusedWindow("General/Hierarchy");
             // select our go
             SelectObject(go);
             // create a new key event (RightArrow for collapsing, LeftArrow for folding)
