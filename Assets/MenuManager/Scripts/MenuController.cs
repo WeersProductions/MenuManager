@@ -17,7 +17,9 @@ namespace WeersProductions
             UNDEFINED = -2,
             NONE = -1,
             SIMPLEPOPUP = 0,
-            SIMPLETOOLTIP = 1
+            SIMPLETOOLTIP = 1,
+            GAMEWINDOW = 2,
+            GAMEMENU = 3
         }
 
         /// <summary>
@@ -67,7 +69,7 @@ namespace WeersProductions
         private void Awake()
         {
             // Set the singleton reference.
-            if (_instance) {
+            if (_instance && _global) {
                 if (_instance._global) {
                     Debug.Log("Some MenuManager is defined as global and is currently set as the instance reference. Are multiple static MenuManager in the scene?");
                 } else {
@@ -98,11 +100,13 @@ namespace WeersProductions
         {
             GameObject outsideMenuGameObject = new GameObject("OutsideMenuClick", typeof(RectTransform));
             RectTransform outsideMenuRect = outsideMenuGameObject.GetComponent<RectTransform>();
-            outsideMenuRect.SetParent(transform);
-            outsideMenuRect.anchoredPosition = Vector2.zero;
+            outsideMenuRect.SetParent(transform, false);
             outsideMenuRect.sizeDelta = Vector2.zero;
             outsideMenuRect.anchorMin = Vector2.zero;
             outsideMenuRect.anchorMax = Vector2.one;
+            // outsideMenuRect.position = Vector3.zero;
+            // outsideMenuRect.rotation = Quaternion.identity;
+            // outsideMenuRect.localScale = Vector3.one;
             outsideMenuGameObject.SetActive(false);
             return outsideMenuGameObject.AddComponent<NonDrawingGraphic>();
         }

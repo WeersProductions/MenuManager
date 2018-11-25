@@ -5,7 +5,7 @@ namespace WeersProductions
     /// <summary>
     /// A simple script that can be attached to any gameobject to create a popup with some buttons.
     /// </summary>
-    public class MenuTest : MonoBehaviour
+    public class TestPopups : MonoBehaviour
     {
         // Use this for initialization
         private void Start()

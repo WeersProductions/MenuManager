@@ -8,10 +8,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e9ecc4959f3b6c4eaa850266aa46dbf, type: 3}
-  m_Name: Settings
+  m_Script: {fileID: 11500000, guid: aae7c8c894e357441ba8bc1351e92b4a, type: 3}
+  m_Name: GameWindow
   m_EditorClassIdentifier: 
-  MenuParent: {fileID: 0}
-  MenuController: {fileID: 0}
-  HasCustomPresetFolder: 0
-  CustomPresetFolder: 
+  _title: GameWindow
+  _description: A general window that can be used in a game
+  _presetObject: {fileID: 0}
