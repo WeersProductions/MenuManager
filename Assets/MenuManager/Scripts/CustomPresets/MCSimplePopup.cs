@@ -78,7 +78,7 @@ namespace WeersProductions
                     }
                     onHover.Delay = 1;
                     onHover.onPointerDelay += () => {
-                        this.MenuController.Addpopup(MenuController.Menus.SIMPLETOOLTIP, false, simpleTooltipData);
+                        this.MenuController.AddPopup(MenuController.Menus.SIMPLETOOLTIP, false, simpleTooltipData);
                     };
                 }
 
