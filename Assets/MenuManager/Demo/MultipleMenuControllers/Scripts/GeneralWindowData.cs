@@ -3,16 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GeneralWindowData {
-
 	private string _text;
-	private Color _color;
+	private Color _backgroundColor;
 	private string[] _buttonsTexts;
+	/// <summary>
+	/// The text that is shown when you click a button.
+	/// </summary>
 	private string[] _buttonFunctionTexts;
 
-	public GeneralWindowData(string text, Color color, string[] buttonsTexts, string[] buttonFunctionTexts)
+	public GeneralWindowData(string text, Color backgroundColor, string[] buttonsTexts, string[] buttonFunctionTexts)
 	{
 		this._text = text;
-		this._color = color;
+		this._backgroundColor = backgroundColor;
 		this._buttonsTexts = buttonsTexts;
 		this._buttonFunctionTexts = buttonFunctionTexts;
 	}
@@ -22,9 +24,9 @@ public class GeneralWindowData {
 		get { return _text; }
 	}
 
-	public Color Color
+	public Color BackgroundColor
 	{
-		get { return _color; }
+		get { return _backgroundColor; }
 	}
 
 	public string[] ButtonsTexts
@@ -32,6 +34,9 @@ public class GeneralWindowData {
 		get { return _buttonsTexts; }
 	}
 
+	/// <summary>
+	/// The text that is shown when you click a button.
+	/// </summary>
 	public string[] ButtonFunctionTexts
 	{
 		get { return _buttonFunctionTexts; }

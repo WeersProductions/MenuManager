@@ -4,6 +4,7 @@ namespace WeersProductions
 {
     /// <summary>
     /// A simple script that can be attached to any gameobject to create a popup with some buttons.
+    /// Creates the popups for the global menucontroller.
     /// </summary>
     public class TestPopups : MonoBehaviour
     {
@@ -36,6 +37,9 @@ namespace WeersProductions
             {
                 // Add the popup to the screen, when there is nothing on the screen it will be added as a menu instead of a popup. 
                 MenuController.AddPopupGlobal(popupMenu, true, simplePopupData);
+
+                // In case you have a specific menucontroller that you want to use:
+                // yourMenuController.AddPopup(popupMenu, true, simplePopupData);
             }
         }
     }

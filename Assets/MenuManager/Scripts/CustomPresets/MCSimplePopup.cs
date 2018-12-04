@@ -18,6 +18,9 @@ namespace WeersProductions
         [SerializeField]
         private Button _buttonPrefab;
 
+        /// <summary>
+        /// The transform that is used as a parent for all the parents.
+        /// </summary>
         [SerializeField]
         private RectTransform _buttonParent;
         [SerializeField]
@@ -50,6 +53,7 @@ namespace WeersProductions
                     newButton.onClick.AddListener(() => buttonData.ButtonClick(newButton));
                 }
 
+                // Use the icon if one is present, use text otherwise.
                 if (buttonData.Icon != null)
                 {
                     Image imageChild = newButton.GetComponentInChildren<Image>();
@@ -61,6 +65,7 @@ namespace WeersProductions
                     textChild.text = buttonData.Text;
                 }
 
+                // Create the tooltip component and add the OnHover components to the object if it wants a tooltip.
                 if (buttonData.Tooltip) 
                 {
                     MCSimpleTooltipData simpleTooltipData = new MCSimpleTooltipData("Tooltip", buttonData.TooltipText,
@@ -73,7 +78,7 @@ namespace WeersProductions
                     }
                     onHover.Delay = 1;
                     onHover.onPointerDelay += () => {
-                        MenuController.AddPopupGlobal(MenuController.Menus.SIMPLETOOLTIP, false, simpleTooltipData);
+                        this.MenuController.Addpopup(MenuController.Menus.SIMPLETOOLTIP, false, simpleTooltipData);
                     };
                 }
 
