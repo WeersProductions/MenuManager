@@ -20,16 +20,30 @@ namespace WeersProductions
         [SerializeField]
         private MenuController.Menus _startMenu;
 
+        /// <summary>
+        /// If set, this MenuController is used to show the menu. Otherwise, Global is used.
+        /// </summary>
+        [SerializeField]
+        private MenuController _menuController;
+
         private void Start()
         {
             if (_disableOthers)
             {
-                MenuController.HideAllMenus(true);
+                if (_menuController) {
+                    _menuController.HideAllMenus(true);
+                } else {
+                    MenuController.HideAllMenusGlobal(true);
+                }
             }
 
             if (_startMenu != MenuController.Menus.NONE && _startMenu != MenuController.Menus.UNDEFINED)
             {
-                MenuController.ShowMenu(_startMenu);
+                if (_menuController) {
+                    _menuController.ShowMenu(_startMenu);
+                } else {
+                    MenuController.ShowMenuGlobal(_startMenu);
+                }
             }
         }
     }

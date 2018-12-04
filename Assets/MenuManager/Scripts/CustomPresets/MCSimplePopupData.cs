@@ -6,27 +6,12 @@ namespace WeersProductions
 {
     public class MCSimplePopupData : MCSimpleTooltipData
     {
-        public delegate void ButtonClick(Button button);
-
-        public MCSimplePopupData(string title, string description, ButtonClick[] buttonActions, string[] buttonStrings)
+        public MCSimplePopupData(string title, string description, MCButtonData[] buttonDatas)
             : base(title, description)
         {
-            ButtonActions = buttonActions;
-            ButtonStrings = buttonStrings;
+            ButtonDatas = buttonDatas;
         }
 
-        public MCSimplePopupData(string title, string description, ButtonClick[] buttonActions,
-            Sprite[] buttonSprites) : base(
-            title, description)
-        {
-            ButtonActions = buttonActions;
-            ButtonSprites = buttonSprites;
-        }
-
-        public ButtonClick[] ButtonActions { get; set; }
-
-        public string[] ButtonStrings { get; set; }
-
-        public Sprite[] ButtonSprites { get; set; }
+        public MCButtonData[] ButtonDatas;
     }
 }

@@ -3,6 +3,10 @@ using UnityEngine;
 
 namespace WeersProductions
 {
+    /// <summary>
+    /// TODO: Get all active MenuControllers
+    /// TODO: Allow names for MenuControllers with string look-up
+    /// </summary>
     public class MenuController : MonoBehaviour
     {
         /// <summary>
@@ -13,13 +17,21 @@ namespace WeersProductions
             UNDEFINED = -2,
             NONE = -1,
             SIMPLEPOPUP = 0,
-            SIMPLETOOLTIP = 1
+            SIMPLETOOLTIP = 1,
+            GENERALWINDOW = 2,
+            GAMEMENU = 3
         }
 
         /// <summary>
-        /// Singleton reference to the MenuController instance.
+        /// Singleton reference to the global MenuController instance.
         /// </summary>
         private static MenuController _instance;
+
+        /// <summary>
+        /// If true, this will overwrite the static instance variable.
+        /// </summary>
+        [SerializeField]
+        private bool _global;
 
         /// <summary>
         /// Used for editor only 
@@ -53,10 +65,20 @@ namespace WeersProductions
         /// </summary>
         private NonDrawingGraphic _clickOutsideMenu;
 
+#region Unity methods
         private void Awake()
         {
             // Set the singleton reference.
-            _instance = this;
+            if (_instance && _global) {
+                if (_instance._global) {
+                    Debug.Log("Some MenuManager is defined as global and is currently set as the instance reference. Are multiple static MenuManager in the scene?");
+                } else {
+                    // The current instance is not defined as global and can thus be overwritten.
+                    _instance = this;
+                }
+            } else {
+                _instance = this;
+            }
 
             // For faster referencing, convert the array to a dictionary for run-time use.
             for (int i = 0; i < _mcMenus.Length; i++)
@@ -67,7 +89,9 @@ namespace WeersProductions
             // Create the object that checks clicking outside of the current menu.
             _clickOutsideMenu = CreateOutsideMenuObject();
         }
+#endregion
 
+#region Instance methods
         /// <summary>
         /// Create the object that checks clicking outside of the current menu and disable it.
         /// </summary>
@@ -76,49 +100,41 @@ namespace WeersProductions
         {
             GameObject outsideMenuGameObject = new GameObject("OutsideMenuClick", typeof(RectTransform));
             RectTransform outsideMenuRect = outsideMenuGameObject.GetComponent<RectTransform>();
-            outsideMenuRect.SetParent(transform);
-            outsideMenuRect.anchoredPosition = Vector2.zero;
+            outsideMenuRect.SetParent(transform, false);
             outsideMenuRect.sizeDelta = Vector2.zero;
             outsideMenuRect.anchorMin = Vector2.zero;
             outsideMenuRect.anchorMax = Vector2.one;
+            // outsideMenuRect.position = Vector3.zero;
+            // outsideMenuRect.rotation = Quaternion.identity;
+            // outsideMenuRect.localScale = Vector3.one;
             outsideMenuGameObject.SetActive(false);
             return outsideMenuGameObject.AddComponent<NonDrawingGraphic>();
         }
-        
+
         /// <summary>
         /// Show a menu with a specific id.
         /// </summary>
         /// <param name="id">The unique id of a menu.</param>
         /// <param name="mcMenuData"></param>
-        public static MCMenu ShowMenu(Menus id, object mcMenuData = null)
+        public MCMenu ShowMenu(Menus id, object mcMenuData = null) 
         {
             return ShowMenu(GetPoolObject(id), mcMenuData);
         }
 
-        /// <summary>
-        /// Will return a duplicate of the original menu so it can be used in the method <see cref="ShowMenu(WeersProductions.MCMenu,object)"/>
-        /// </summary>
-        /// <param name="id">The TYPE of the menu</param>
-        /// <returns></returns>
-        public static MCMenu GetMenu(Menus id)
-        {
-            return GetPoolObject(id);
-        }
-
-        /// <summary>
+                /// <summary>
         /// Show a specific menu.
         /// If this menu needs fullscreen and the current active menus allow it to override them, it will close the current menus.
         /// </summary>
         /// <param name="mcMenu">The new menu. (this is a copy of the original)</param>
         /// <param name="mcMenuData"></param>
-        public static MCMenu ShowMenu(MCMenu mcMenu, object mcMenuData = null)
+        public MCMenu ShowMenu(MCMenu mcMenu, object mcMenuData = null)
         {
             if (mcMenu.Fullscreen)
             {
                 bool canShow = true;
-                for (int i = 0; i < _instance._activeMenus.Count; i++)
+                for (int i = 0; i < _activeMenus.Count; i++)
                 {
-                    if (_instance._activeMenus[i].ShouldBlockNewMenu)
+                    if (_activeMenus[i].ShouldBlockNewMenu)
                     {
                         canShow = false;
                         break;
@@ -133,26 +149,38 @@ namespace WeersProductions
                 {
                     if (mcMenu.ShouldBeQueued)
                     {
-                        _instance._menuQueue.Enqueue(new MenuQueueItem(mcMenu, mcMenuData));
+                        _menuQueue.Enqueue(new MenuQueueItem(mcMenu, mcMenuData));
                     }
                     return mcMenu;
                 }
             }
 
-            _instance.InitializeOutsideClick(mcMenu);
+            InitializeOutsideClick(mcMenu);
+            // Add ourselves as the owner of the menu.
+            mcMenu.SetMenuController(this);
             // We can show this one.
             mcMenu.Show(mcMenuData);
-            _instance._activeMenus.Add(mcMenu);
+            _activeMenus.Add(mcMenu);
             return mcMenu;
+        }
+
+        /// <summary>
+        /// Will return a duplicate of the original menu in the global MenuController so it can be used in the method <see cref="ShowMenu(WeersProductions.MCMenu,object)"/>
+        /// </summary>
+        /// <param name="id">The TYPE of the menu</param>
+        /// <returns></returns>
+        public MCMenu GetMenu(Menus id)
+        {
+            return GetPoolObject(id);
         }
 
         /// <summary>
         /// Hide all menus.
         /// </summary>
         /// <param name="hideAll">If true it will set all children as inactive (it will not <see cref="HideMenu"/> them!) of the MenuController, even those that are not marked as active.</param>
-        public static void HideAllMenus(bool hideAll = false)
+        public void HideAllMenus(bool hideAll = false)
         {
-            List<MCMenu> copy = new List<MCMenu>(_instance._activeMenus);
+            List<MCMenu> copy = new List<MCMenu>(_activeMenus);
             for (int i = 0; i < copy.Count; i++)
             {
                 HideMenu(copy[i]);
@@ -160,7 +188,7 @@ namespace WeersProductions
 
             if (hideAll)
             {
-                MCMenu[] allMenus = _instance.GetComponentsInChildren<MCMenu>();
+                MCMenu[] allMenus = GetComponentsInChildren<MCMenu>();
                 for (int i = 0; i < allMenus.Length; i++)
                 {
                     allMenus[i].SetState(false);
@@ -171,9 +199,9 @@ namespace WeersProductions
         /// <summary>
         /// Will hide all menus that are blocking other menus from showing up.
         /// </summary>
-        public static void HideAllBlockingMenus()
+        public void HideAllBlockingMenus()
         {
-            List<MCMenu> copy = new List<MCMenu>(_instance._activeMenus);
+            List<MCMenu> copy = new List<MCMenu>(_activeMenus);
             for (int i = 0; i < copy.Count; i++)
             {
                 if (copy[i].ShouldBlockNewMenu)
@@ -184,89 +212,18 @@ namespace WeersProductions
         }
 
         /// <summary>
-        /// Hide a specific menu.
-        /// </summary>
-        /// <param name="mcMenu"></param>
-        public static void HideMenu(MCMenu mcMenu)
-        {
-            mcMenu.Hide(() => OnHideMenu(mcMenu));
-        }
-
-        /// <summary>
-        /// Called when a menu is ready to be actually hidden internally (from the data structure).
-        /// </summary>
-        /// <param name="mcMenu"></param>
-        private static void OnHideMenu(MCMenu mcMenu)
-        {
-            if (_instance._activeMenus.Contains(mcMenu))
-            {
-                _instance._clickOutsideMenu.gameObject.SetActive(false);
-
-                _instance._activeMenus.Remove(mcMenu);
-                // Only check the menu when we actually removed something.
-                if (!CheckMenuQueue())
-                {
-                    // We did not activate a menu in the queue.
-                    _instance.InitializeOutsideClick();
-                }
-            }
-            else
-            {
-                if (mcMenu.Parent)
-                {
-                    _instance.InitializeOutsideClick(mcMenu.Parent);
-                }
-                else
-                {
-                    _instance.InitializeOutsideClick();
-                }
-            }
-
-            if (mcMenu.ShouldBePooled)
-            {
-                // It should be pooled, add it.
-                AddPoolObject(mcMenu);
-            }
-            else
-            {
-                // Since it should not be pooled, we destroy it.
-                Destroy(mcMenu.gameObject);
-            }
-        }
-
-        /// <summary>
-        /// Checks the queue of menus waiting to be activated and will activate them if possible.
-        /// </summary>
-        /// <returns>True if a new menu is activated that was in the queue.</returns>
-        private static bool CheckMenuQueue()
-        {
-            if (_instance._activeMenus.Count <= 0)
-            {
-                // There are no menus active, check the queue!
-                if (_instance._menuQueue.Count > 0)
-                {
-                    // There is a menu in the queue, let show it.
-                    MenuQueueItem menuQueueItem = _instance._menuQueue.Dequeue();
-                    ShowMenu(menuQueueItem.Menu, menuQueueItem.Data);
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
         /// Will add a menu popup for the current visible menu (first one that was visible).
         /// </summary>
         /// <param name="mcMenu"></param>
         /// <param name="createWhenNoMenu">If true this popup will be made an active window in the case of no active windows at the time of calling this.
         /// If false, no popup will be shown if there is no active window.</param>
         /// <param name="data"></param>
-        public static MCMenu AddPopup(MCMenu mcMenu, bool createWhenNoMenu, object data = null)
+        public MCMenu AddPopup(MCMenu mcMenu, bool createWhenNoMenu, object data = null)
         {
-            if (_instance._activeMenus.Count > 0)
+            if (_activeMenus.Count > 0)
             {
-                _instance.InitializeOutsideClick(mcMenu);
-                _instance._activeMenus[0].AddPopup(mcMenu, data);
+                InitializeOutsideClick(mcMenu);
+                _activeMenus[0].AddPopup(mcMenu, data);
             }
             else
             {
@@ -276,7 +233,7 @@ namespace WeersProductions
                 }
             }
             return mcMenu;
-        }
+        }       
 
         /// <summary>
         /// A wrapper for <see cref="AddPopup(MCMenu,bool, object)"/>
@@ -284,7 +241,7 @@ namespace WeersProductions
         /// <param name="id"></param>
         /// <param name="createWhenNoMenu"></param>
         /// <param name="data"></param>
-        public static MCMenu AddPopup(Menus id, bool createWhenNoMenu, object data = null)
+        public MCMenu AddPopup(Menus id, bool createWhenNoMenu, object data = null)
         {
             if (id == Menus.NONE)
             {
@@ -300,33 +257,24 @@ namespace WeersProductions
         /// <param name="parent">The parent object that already exists.</param>
         /// <param name="data">Data that should be passed on to the popup that is created.</param>
         /// <returns></returns>
-        public static MCMenu AddPopup(Menus id, MCMenu parent, object data = null)
+        public MCMenu AddPopup(Menus id, MCMenu parent, object data = null)
         {
             if (id == Menus.NONE)
             {
                 return null;
             }
             return parent.AddPopup(GetPoolObject(id), data);
-        }
+        } 
 
         /// <summary>
-        /// Called when a popup is added directly to the McMenu and will make sure the OutsideClick is correctly configured.
-        /// </summary>
-        /// <param name="mcMenu"></param>
-        public static void OnMenuAdded(MCMenu mcMenu)
-        {
-            _instance.InitializeOutsideClick(mcMenu);
-        }
-
-        /// <summary>
-        /// Returns a poolObject if available, otherwise it will instantiate a new menu.
+        /// Returns a poolObject from the global MenuManager if available, otherwise it will instantiate a new menu.
         /// </summary>
         /// <param name="menu"></param>
         /// <returns></returns>
-        private static MCMenu GetPoolObject(Menus menu)
+        private MCMenu GetPoolObject(Menus menu)
         {
             Queue<MCMenu> menus;
-            if (_instance._menuPool.TryGetValue(menu, out menus))
+            if (_menuPool.TryGetValue(menu, out menus))
             {
                 if (menus.Count > 0)
                 {
@@ -337,26 +285,15 @@ namespace WeersProductions
             }
 
             // We could not find a poolObject, instantiate a new object.
-            MCMenu mcMenu = Instantiate(_instance._menus[menu], _instance.transform);
+            MCMenu menuObject;
+            if(!_menus.TryGetValue(menu, out menuObject))
+            {
+                Debug.LogError("Trying to show a menu that is not added to this MenuController: " + menu);
+                return null;
+            }
+            MCMenu mcMenu = Instantiate(menuObject, transform);
             mcMenu.SetState(false);
             return mcMenu;
-        }
-
-        /// <summary>
-        /// Add a poolObject to the pool for a certain menu.
-        /// Only does data managing, the object should already be ready for pooling (E.G. inactive).
-        /// </summary>
-        /// <param name="menu"></param>
-        private static void AddPoolObject(MCMenu menu)
-        {
-            Queue<MCMenu> menus;
-            if (!_instance._menuPool.TryGetValue(menu.Id, out menus))
-            {
-                menus = new Queue<MCMenu>();
-                _instance._menuPool.Add(menu.Id, menus);
-            }
-
-            menus.Enqueue(menu);
         }
 
         /// <summary>
@@ -403,13 +340,242 @@ namespace WeersProductions
         }
 
         /// <summary>
+        /// Hide a specific menu.
+        /// </summary>
+        /// <param name="mcMenu"></param>
+        public void HideMenu(MCMenu mcMenu)
+        {
+            mcMenu.Hide(() => OnHideMenu(mcMenu));
+        }
+
+        /// <summary>
+        /// Checks the queue of menus waiting to be activated and will activate them if possible.
+        /// </summary>
+        /// <returns>True if a new menu is activated that was in the queue.</returns>
+        private bool CheckMenuQueue()
+        {
+            if (_activeMenus.Count <= 0)
+            {
+                // There are no menus active, check the queue!
+                if (_menuQueue.Count > 0)
+                {
+                    // There is a menu in the queue, let show it.
+                    MenuQueueItem menuQueueItem = _menuQueue.Dequeue();
+                    ShowMenu(menuQueueItem.Menu, menuQueueItem.Data);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Called when a menu is ready to be actually hidden internally (from the data structure).
+        /// </summary>
+        /// <param name="mcMenu"></param>
+        private void OnHideMenu(MCMenu mcMenu)
+        {
+            if (_activeMenus.Contains(mcMenu))
+            {
+                _clickOutsideMenu.gameObject.SetActive(false);
+
+                _activeMenus.Remove(mcMenu);
+                // Only check the menu when we actually removed something.
+                if (!CheckMenuQueue())
+                {
+                    // We did not activate a menu in the queue.
+                    InitializeOutsideClick();
+                }
+            }
+            else
+            {
+                if (mcMenu.Parent)
+                {
+                    InitializeOutsideClick(mcMenu.Parent);
+                }
+                else
+                {
+                    InitializeOutsideClick();
+                }
+            }
+
+            if (mcMenu.ShouldBePooled)
+            {
+                // It should be pooled, add it.
+                AddPoolObject(mcMenu);
+            }
+            else
+            {
+                // Since it should not be pooled, we destroy it.
+                Destroy(mcMenu.gameObject);
+            }
+        }
+
+        /// <summary>
+        /// Add a poolObject to the pool for a certain menu.
+        /// Only does data managing, the object should already be ready for pooling (E.G. inactive).
+        /// </summary>
+        /// <param name="menu"></param>
+        private void AddPoolObject(MCMenu menu)
+        {
+            Queue<MCMenu> menus;
+            if (!_menuPool.TryGetValue(menu.Id, out menus))
+            {
+                menus = new Queue<MCMenu>();
+                _menuPool.Add(menu.Id, menus);
+            }
+
+            menus.Enqueue(menu);
+        }
+
+        /// <summary>
         /// Checks if any menus are currently active.
         /// </summary>
         /// <returns>True if any menu is active, false if no menu is active.</returns>
-        public static bool AnyMenuActive()
+        public bool AnyMenuActive()
         {
-            return _instance._activeMenus.Count > 0;
+            return _activeMenus.Count > 0;
         }
+
+        /// <summary>
+        /// Called when a popup is added directly to the McMenu and will make sure the OutsideClick is correctly configured.
+        /// </summary>
+        /// <param name="mcMenu"></param>
+        public void OnMenuAdded(MCMenu mcMenu)
+        {
+            InitializeOutsideClick(mcMenu);
+        }
+#endregion
+
+#region Static methods
+        /// <summary>
+        /// Show a menu with a specific id on the global MenuManager.
+        /// </summary>
+        /// <param name="id">The unique id of a menu.</param>
+        /// <param name="mcMenuData"></param>
+        public static MCMenu ShowMenuGlobal(Menus id, object mcMenuData = null)
+        {
+            return _instance.ShowMenu(id, mcMenuData);
+        }
+
+        /// <summary>
+        /// Will return a duplicate of the original menu in the global MenuController so it can be used in the method <see cref="ShowMenu(WeersProductions.MCMenu,object)"/>
+        /// </summary>
+        /// <param name="id">The TYPE of the menu</param>
+        /// <returns></returns>
+        public static MCMenu GetMenuGlobal(Menus id)
+        {
+            return _instance.GetMenu(id);
+        }
+
+        /// <summary>
+        /// Show a specific menu in the global MenuController.
+        /// If this menu needs fullscreen and the current active menus allow it to override them, it will close the current menus.
+        /// </summary>
+        /// <param name="mcMenu">The new menu. (this is a copy of the original)</param>
+        /// <param name="mcMenuData"></param>
+        public static MCMenu ShowMenuGlobal(MCMenu mcMenu, object mcMenuData = null)
+        {
+            return _instance.ShowMenu(mcMenu, mcMenuData);
+        }
+
+        /// <summary>
+        /// Hide all menus for the global MenuController.
+        /// </summary>
+        /// <param name="hideAll">If true it will set all children as inactive (it will not <see cref="HideMenu"/> them!) of the MenuController, even those that are not marked as active.</param>
+        public static void HideAllMenusGlobal(bool hideAll = false)
+        {
+            _instance.HideAllMenus(hideAll);
+        }
+
+        /// <summary>
+        /// Will hide all menus for the global MenuController that are blocking other menus from showing up.
+        /// </summary>
+        public static void HideAllBlockingMenusGlobal()
+        {
+            _instance.HideAllBlockingMenus();
+        }
+
+        /// <summary>
+        /// Hide a specific menu for the global MenuController.
+        /// </summary>
+        /// <param name="mcMenu"></param>
+        public static void HideMenuGlobal(MCMenu mcMenu)
+        {
+            _instance.HideMenu(mcMenu);
+        }
+
+        /// <summary>
+        /// Checks the queue of menus (of the global MenuController) waiting to be activated and will activate them if possible.
+        /// </summary>
+        /// <returns>True if a new menu is activated that was in the queue.</returns>
+        private static bool CheckMenuQueueGlobal()
+        {
+            return _instance.CheckMenuQueue();
+        }
+
+        /// <summary>
+        /// Will add a menu popup for the current visible menu (first one that was visible) for the global MenuController.
+        /// </summary>
+        /// <param name="mcMenu"></param>
+        /// <param name="createWhenNoMenu">If true this popup will be made an active window in the case of no active windows at the time of calling this.
+        /// If false, no popup will be shown if there is no active window.</param>
+        /// <param name="data"></param>
+        public static MCMenu AddPopupGlobal(MCMenu mcMenu, bool createWhenNoMenu, object data = null)
+        {
+            return _instance.AddPopup(mcMenu, createWhenNoMenu, data);
+        }
+
+        /// <summary>
+        /// A wrapper for <see cref="AddPopup(MCMenu,bool, object)"/> for the global menu
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="createWhenNoMenu"></param>
+        /// <param name="data"></param>
+        public static MCMenu AddPopupGlobal(Menus id, bool createWhenNoMenu, object data = null)
+        {
+            return _instance.AddPopup(id, createWhenNoMenu, data);
+        }
+
+        /// <summary>
+        /// Add a popup with an id to an existing menu to the global MenuController
+        /// </summary>
+        /// <param name="id">The id of the new popup.</param>
+        /// <param name="parent">The parent object that already exists.</param>
+        /// <param name="data">Data that should be passed on to the popup that is created.</param>
+        /// <returns></returns>
+        public static MCMenu AddPopupGlobal(Menus id, MCMenu parent, object data = null)
+        {
+            return _instance.AddPopup(id, parent, data);
+        }
+
+        /// <summary>
+        /// Called when a popup is added directly to the McMenu and will make sure the OutsideClick is correctly configured.
+        /// </summary>
+        /// <param name="mcMenu"></param>
+        public static void OnMenuAddedGlobal(MCMenu mcMenu)
+        {
+            _instance.InitializeOutsideClick(mcMenu);
+        }
+
+        /// <summary>
+        /// Add a poolObject to the pool (of the global MenuController) for a certain menu.
+        /// Only does data managing, the object should already be ready for pooling (E.G. inactive).
+        /// </summary>
+        /// <param name="menu"></param>
+        private static void AddPoolObjectGlobal(MCMenu menu)
+        {
+            _instance.AddPoolObject(menu);
+        }
+
+        /// <summary>
+        /// Checks if any menus are currently active for the global MenuController.
+        /// </summary>
+        /// <returns>True if any menu is active, false if no menu is active.</returns>
+        public static bool AnyMenuActiveGlobal()
+        {
+            return _instance.AnyMenuActive();
+        }
+#endregion
     }
 
     /// <summary>
