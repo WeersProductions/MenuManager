@@ -52,8 +52,6 @@ namespace WeersProductions
             return findObjectsOfTypeAll[0];
         }
 
-        public RectTransform MenuParent;
-
         public static MenuCreatorPreset[] GetAllPresets()
         {
             EditorMenuCreatorSettings settings = GetEditorMenuCreatorSettings();

@@ -4,6 +4,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
+using System.Reflection;
 
 namespace WeersProductions
 {
@@ -34,32 +35,61 @@ namespace WeersProductions
 
         #region Options
 
+        private MenuController _currentSelectedMenuController;
+
         private EditorMenuCreatorSettings _editorMenuCreatorSettings;
         #endregion
 
         #endregion
 
         [MenuItem("GameObject/WeersProductions/Add menu", false, 0)]
-        private static void AddMenu()
+        private static void AddMenu(MenuCommand menuCommand)
         {
-            EditorMenuCreatorSettings settingsAsset = EditorMenuCreatorSettings.GetEditorMenuCreatorSettings();
-            Transform parent = null;
-            if (settingsAsset && settingsAsset.MenuParent)
-            {
-                parent = settingsAsset.MenuParent;
-            }
-            else
-            {
-                Canvas menuParent = GameObject.FindObjectOfType<Canvas>();
-                if (menuParent)
-                {
-                    parent = menuParent.GetComponent<Transform>();
+            if(Selection.objects.Length > 1) {
+                if(menuCommand.context != Selection.objects[0]) {
+                    return;
                 }
             }
+            // Use the selected objects. 
+            MenuController[] menuControllers = HierarchyHelper.GetObjectsOfType<MenuController>();
+            if(menuControllers.Length <= 0) {
+                // Find MenuControllers in the scene
+                menuControllers = GameObject.FindObjectsOfType<MenuController>();
+            }
+            if(menuControllers.Length <= 0) {
+                EditorUtility.DisplayDialog("Adding menu", "Could not find any MenuController in this scene.", "Create MenuController", "Cancel");
+                // TODO: implement the buttons of the dialog.
+                // If the user wanted to create a menucontroller, set the new menucontroller that is created as selected.
+            }
+            if(menuControllers.Length > 1) {
+                // Show a popup so the user can choose what menuController to use.
+                try {
+                    Vector2 coordinates = new Vector2(Screen.width / 2, Screen.height / 2);
+                    FieldInfo field = typeof ( Event ).GetField ( "s_Current", BindingFlags.Static | BindingFlags.NonPublic );
+                    if ( field != null )
+                    {
+                        Event current = field.GetValue ( null ) as Event;
+                        if ( current != null )
+                        {
+                            coordinates = current.mousePosition;
+                        }
+                    }
+                    // TODO: fix popup location.
+                    PopupWindow.Show(new Rect(GUIUtility.ScreenToGUIPoint(coordinates), new Vector2(250, 150)), new MenuControllerSelector(menuControllers, (MenuController menuController) => {
+                    AddMenuToTransform(menuController.transform);
+                }));
+                } catch (UnityEngine.ExitGUIException) {
+                    // https://answers.unity.com/questions/385235/editorguilayoutcolorfield-inside-guilayoutwindow-c.html
+                }
+            } else {
+                AddMenuToTransform(menuControllers[0].transform);
+            }
+            // TODO: Add the new menu to the selected menuController
+        }
 
+        private static void AddMenuToTransform(Transform parent) {
             if (!parent)
             {
-                Debug.LogError("Please add a Canvas to the scene.");
                 return;
             }
 
@@ -140,23 +170,6 @@ namespace WeersProductions
 
                 everythingIsPerfect = false;
             }
-            if (!_editorMenuCreatorSettings.MenuParent)
-            {
-                EditorGUILayout.HelpBox("The parent for the menus is not yet set, set it in the options manually or try the button below.", MessageType.Warning);
-                if (GUILayout.Button("Use first Canvas that's found"))
-                {
-                    Canvas menuParent = GameObject.FindObjectOfType<Canvas>();
-
-                    if (menuParent)
-                    {
-                        _editorMenuCreatorSettings.MenuParent = menuParent.GetComponent<RectTransform>();
-
-                        EditorUtility.SetDirty(_editorMenuCreatorSettings);
-                    }
-                }
-                everythingIsPerfect = false;
-            }
-
             if (everythingIsPerfect)
             {
                 EditorGUILayout.HelpBox("Seems like everything is fine! Enjoy ;)", MessageType.Info);
@@ -251,7 +264,7 @@ namespace WeersProductions
         /// <param name="menuCreatorPreset"></param>
         private void CreateMenu(MenuCreatorPreset menuCreatorPreset)
         {
-            GameObject newMenu = Instantiate(menuCreatorPreset.PresetObject, _editorMenuCreatorSettings.MenuParent);
+            GameObject newMenu = Instantiate(menuCreatorPreset.PresetObject, _currentSelectedMenuController.transform);
             Undo.RegisterCreatedObjectUndo(newMenu, "Created menu");
 
             MCMenu mcMenu = newMenu.GetComponentInChildren<MCMenu>();
@@ -409,7 +422,6 @@ namespace WeersProductions
         /// </summary>
         private void DrawOptions()
         {
-            _editorMenuCreatorSettings.MenuParent = (RectTransform)EditorGUILayout.ObjectField("Parent of new menus", _editorMenuCreatorSettings.MenuParent, typeof(RectTransform), true);
             _editorMenuCreatorSettings.MenuController = (MenuController)EditorGUILayout.ObjectField("Menu Controller",
                 _editorMenuCreatorSettings.MenuController, typeof(MenuController), true);
 
