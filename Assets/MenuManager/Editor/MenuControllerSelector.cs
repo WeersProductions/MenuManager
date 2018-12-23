@@ -29,7 +29,7 @@ namespace WeersProductions
 
 		public override void OnGUI(Rect rect)
 		{
-			GUILayout.Label("Select a MenuController from the scene", EditorStyles.boldLabel);
+			GUILayout.Label("Select a MenuController", EditorStyles.boldLabel);
 			_scrollviewPosition = GUILayout.BeginScrollView(_scrollviewPosition);
 			
 			for(int i = 0; i < _menuControllers.Length; i++) {
