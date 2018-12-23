@@ -3,18 +3,18 @@ using UnityEditor;
 
 namespace WeersProductions
 {
-	public class MenuControllerSelector : PopupWindowContent
+	public class CanvasSelector : PopupWindowContent
 	{
-		private MenuController[] _menuControllers;
+		private Canvas[] _canvasses;
 
-		public delegate void SelectEvent(MenuController menuController);
+		public delegate void SelectEvent(Canvas canvas);
 
 		private SelectEvent _onSelected;
 
 		private Vector2 _scrollviewPosition;
 
-		public MenuControllerSelector(MenuController[] menuControllers, SelectEvent onSelected) {
-			_menuControllers = menuControllers;
+		public CanvasSelector(Canvas[] canvasses, SelectEvent onSelected) {
+			_canvasses = canvasses;
 			_onSelected = onSelected;
 		}
 
@@ -25,18 +25,24 @@ namespace WeersProductions
 
 		public override void OnGUI(Rect rect)
 		{
-			GUILayout.Label("Select a MenuController", EditorStyles.boldLabel);
+			GUILayout.Label("Select a Canvas", EditorStyles.boldLabel);
 			_scrollviewPosition = GUILayout.BeginScrollView(_scrollviewPosition);
 			
-			for(int i = 0; i < _menuControllers.Length; i++) {
+			for(int i = 0; i < _canvasses.Length; i++) {
 				int index = i;
-				if(GUILayout.Button(_menuControllers[i].name)) {
+				// TODO: Add warning if canvas already contains a MenuController
+				if(GUILayout.Button(_canvasses[i].name)) {
 					editorWindow.Close();
-					_onSelected(_menuControllers[index]);
+					_onSelected(_canvasses[index]);
 				}
 			}
 			
 			GUILayout.EndScrollView();
+			EditorGUILayout.Separator();
+			if(GUILayout.Button("Create new")) {
+				editorWindow.Close();
+				_onSelected(null);
+			}
 		}
 
 		public override void OnOpen()

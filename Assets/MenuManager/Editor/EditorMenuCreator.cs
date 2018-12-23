@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 using System.Reflection;
+using System.Linq;
 
 namespace WeersProductions
 {
@@ -51,29 +52,27 @@ namespace WeersProductions
                 }
             }
             // Use the selected objects. 
-            MenuController[] menuControllers = HierarchyHelper.GetObjectsOfType<MenuController>();
+            MenuController[] menuControllers = HierarchyHelper.GetSelectedOrGeneralObjectsOfType<MenuController>();
             if(menuControllers.Length <= 0) {
-                // Find MenuControllers in the scene
-                menuControllers = GameObject.FindObjectsOfType<MenuController>();
+                if(EditorUtility.DisplayDialog("Adding menu", "Could not find any MenuController in this scene.", "Create MenuController", "Cancel")) {
+                    // TODO: implement 'create MenuController'
+                    // If the user wanted to create a menucontroller, set the new menucontroller that is created as selected.
+                    CreateMenuController((MenuController menuController) => {
+                        AddMenuToMenuController(new MenuController[]{menuController});
+                    });
+                } else {
+                    return;
+                }
+            } else {
+                AddMenuToMenuController(menuControllers);
             }
-            if(menuControllers.Length <= 0) {
-                EditorUtility.DisplayDialog("Adding menu", "Could not find any MenuController in this scene.", "Create MenuController", "Cancel");
-                // TODO: implement the buttons of the dialog.
-                // If the user wanted to create a menucontroller, set the new menucontroller that is created as selected.
-            }
+        }
+
+        private static void AddMenuToMenuController(MenuController[] menuControllers) {
             if(menuControllers.Length > 1) {
                 // Show a popup so the user can choose what menuController to use.
                 try {
-                    Vector2 coordinates = new Vector2(Screen.width / 2, Screen.height / 2);
-                    FieldInfo field = typeof ( Event ).GetField ( "s_Current", BindingFlags.Static | BindingFlags.NonPublic );
-                    if ( field != null )
-                    {
-                        Event current = field.GetValue ( null ) as Event;
-                        if ( current != null )
-                        {
-                            coordinates = current.mousePosition;
-                        }
-                    }
+                    Vector2 coordinates = EditorUtils.GetMousePosition();
                     // TODO: fix popup location.
                     PopupWindow.Show(new Rect(GUIUtility.ScreenToGUIPoint(coordinates), new Vector2(250, 150)), new MenuControllerSelector(menuControllers, (MenuController menuController) => {
                     AddMenuToTransform(menuController.transform);
@@ -84,7 +83,7 @@ namespace WeersProductions
             } else {
                 AddMenuToTransform(menuControllers[0].transform);
             }
-            // TODO: Add the new menu to the selected menuController
+            // TODO: Add the new menu to the selected menuController   
         }
 
         private static void AddMenuToTransform(Transform parent) {
@@ -102,6 +101,35 @@ namespace WeersProductions
             {
                 Undo.SetTransformParent(newMenu.GetComponent<Transform>(), parent, "Create menu");
                 EditorUtils.Collapse(parent.gameObject, true);
+            }
+        }
+
+        /// <summary>
+        /// Shows popup for the user to choose a Canvas that will be used and adds a MenuController component to it.
+        /// </summary>
+        private static void CreateMenuController(UnityEngine.Events.UnityAction<MenuController> onFinish) {
+            Canvas[] canvasses = HierarchyHelper.GetSelectedOrGeneralObjectsOfType<Canvas>();
+            Vector2 coordinates = EditorUtils.GetMousePosition();
+            try {
+                PopupWindow.Show(new Rect(GUIUtility.ScreenToGUIPoint(coordinates), new Vector2(250, 150)), new CanvasSelector(canvasses, (Canvas canvas) => {
+                    if(canvas == null) {
+                        // The user wants us to create a canvas
+                        EditorApplication.ExecuteMenuItem("GameObject/UI/Canvas");
+                        Canvas[] newCanvasses = HierarchyHelper.GetObjectsOfType<Canvas>();
+                        canvasses = newCanvasses.Except(canvasses).ToArray();
+                        if(canvasses == null || canvasses.Length <= 0) {
+                            Debug.LogError("Something went wrong with creating the new canvas. Please try again.");
+                            return;
+                        }
+                        canvas = canvasses[0];
+                    }
+                    MenuController result = Undo.AddComponent<MenuController>(canvas.gameObject);
+                    if(onFinish != null) {
+                        onFinish(result);
+                    }
+                }));
+            } catch (UnityEngine.ExitGUIException) {
+                // https://answers.unity.com/questions/385235/editorguilayoutcolorfield-inside-guilayoutwindow-c.html
             }
         }
 
