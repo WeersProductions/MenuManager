@@ -38,15 +38,5 @@ namespace WeersProductions
 			
 			GUILayout.EndScrollView();
 		}
-
-		public override void OnOpen()
-		{
-			Debug.Log("Popup opened: " + this);
-		}
-
-		public override void OnClose()
-		{
-			Debug.Log("Popup closed: " + this);
-		}
 	}
 }
