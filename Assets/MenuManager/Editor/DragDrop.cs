@@ -8,11 +8,13 @@ public static class DragDrop
 
     public delegate void OnDrop(Object[] dropObjects);
 
-    public static void DrawDragDrop(string label, OnDrop onDrop)
+    public static void DrawDragDrop(string label, OnDrop onDrop, float height = 50.0f)
     {
         Event evt = Event.current;
-        Rect dropArea = GUILayoutUtility.GetRect(0.0f, 50.0f, GUILayout.ExpandWidth(true));
-        GUI.Box(dropArea, label);
+        GUIStyle guiStyle = GUI.skin.GetStyle("Box");
+        guiStyle.alignment = TextAnchor.MiddleCenter;
+        Rect dropArea = GUILayoutUtility.GetRect(0.0f, height, GUILayout.ExpandWidth(true));
+        GUI.Box(dropArea, label, guiStyle);
 
         switch (evt.type)
         {

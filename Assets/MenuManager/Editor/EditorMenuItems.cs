@@ -9,7 +9,7 @@ namespace WeersProductions
 {
 	public static class EditorMenuItems {
 
-	[MenuItem("GameObject/WeersProductions/Add menu", false, 0)]
+	    [MenuItem("GameObject/WeersProductions/Menu", false, 0)]
         private static void AddMenu(MenuCommand menuCommand)
         {
             if(Selection.objects.Length > 1) {
@@ -96,6 +96,11 @@ namespace WeersProductions
             } catch (UnityEngine.ExitGUIException) {
                 // https://answers.unity.com/questions/385235/editorguilayoutcolorfield-inside-guilayoutwindow-c.html
             }
+        }
+
+        [MenuItem("GameObject/WeersProductions/MenuController", false, 0)]
+        private static void CreateMenuController() {
+            CreateMenuController(null);
         }
 	}
 }

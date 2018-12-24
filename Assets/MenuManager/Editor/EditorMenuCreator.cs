@@ -4,6 +4,8 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
+using UnityEditor.SceneManagement;
+using UnityEngine.SceneManagement;
 
 namespace WeersProductions
 {
@@ -21,7 +23,6 @@ namespace WeersProductions
         private string[] _presetDescriptions;
 
         private SerializedObject _menuController;
-        private bool _showMenuList;
         #endregion
 
         #region create preset
@@ -34,14 +35,14 @@ namespace WeersProductions
 
         #region Options
 
-        private MenuController _currentSelectedMenuController;
+        private int _selectedMenuController = -1;
+        private MenuController[] _availableMenuControllers;
+        private string[] _availableMenuControllersLabels;
 
         private EditorMenuCreatorSettings _editorMenuCreatorSettings;
         #endregion
 
         #endregion
-
-        
 
         [MenuItem("Window/WeersProductions/MenuManager")]
         private static void Init()
@@ -55,10 +56,9 @@ namespace WeersProductions
         {
             _tabsBlock = new TabsBlock(new Dictionary<string, Action>
             {
-                {"Initialize", DrawInitialize },
+                {"Manage menus", DrawManageMenus },
                 {"Create menu", DrawCreateMenu },
-                {"Create preset", DrawCreatePreset },
-                {"Options", DrawOptions }
+                {"Create preset", DrawCreatePreset }
             });
         }
 
@@ -67,48 +67,123 @@ namespace WeersProductions
             CreateOrLoadSettings();
         }
 
+        private void OnHierarchyChange() {
+            UpdateAvailableMenuControllers();
+            Repaint();
+        }
+
         void OnGUI()
         {
+            EnsureSettingsObject();
+            DrawSelectMenuController();
             _tabsBlock.Draw();
         }
 
-        /// <summary>
-        /// Draws the initalize panel.
-        /// </summary>
-        private void DrawInitialize()
+        private void UpdateAvailableMenuControllers()
         {
-            EnsureSettingsObject();
-            bool everythingIsPerfect = true;
+            // TODO: support MenuControllers in prefabs?
+            _availableMenuControllers = HierarchyHelper.GetObjectsOfType<MenuController>();
+            int labelSize = _availableMenuControllers.Length;
+            _availableMenuControllersLabels = new string[labelSize];
+            for(int i = 0; i < _availableMenuControllers.Length; i++) {
+                _availableMenuControllersLabels[i] = _availableMenuControllers[i].name;
+                if (_editorMenuCreatorSettings.MenuController == _availableMenuControllers[i]) {
+                    _selectedMenuController = i;
+                }
+            }
+            if(_selectedMenuController >= _availableMenuControllers.Length) {
+                _selectedMenuController = -1;
+            }
+        }
+
+        private void DrawSelectMenuController()
+        {
+            EditorGUILayout.Space();
+            _selectedMenuController = EditorGUILayout.Popup("Current MenuController: ", _selectedMenuController, _availableMenuControllersLabels);
+            if(_selectedMenuController >= 0 && _selectedMenuController < _availableMenuControllers.Length) {
+                _editorMenuCreatorSettings.MenuController = _availableMenuControllers[_selectedMenuController];
+                if(_editorMenuCreatorSettings.MenuController) {
+                    _menuController = new SerializedObject(_editorMenuCreatorSettings.MenuController);
+                }
+                EditorUtility.SetDirty(_editorMenuCreatorSettings);
+            } else {
+                _editorMenuCreatorSettings.MenuController = null;
+                _menuController = null;
+            }
+            EditorGUILayout.Space();
+            if(_availableMenuControllers == null || _availableMenuControllers.Length <= 0) {
+                EditorGUILayout.HelpBox("No MenuControllers in this scene.", MessageType.Warning);
+                if(GUILayout.Button("Create MenuController")) {
+                    EditorApplication.ExecuteMenuItem("GameObject/WeersProductions/MenuController");
+                }
+                EditorGUILayout.Space();
+            } else if(_selectedMenuController < 0) {
+                EditorGUILayout.HelpBox("Select a MenuController to start.", MessageType.Warning);
+                EditorGUILayout.Space();
+            }
+        }
+
+        private void DrawManageMenus() 
+        {
             if (!_editorMenuCreatorSettings.MenuController)
             {
-                EditorGUILayout.HelpBox("The MenuController is not yet set, set it in the options manually or try the button below.", MessageType.Warning);
+                EditorGUILayout.HelpBox("First select a MenuController.", MessageType.Info);
+                return;
+            }
+            
+            EditorGUILayout.LabelField("Current menus", EditorStyles.boldLabel);
+            EditorGUILayout.Space();
+
+            _menuController.Update();
+            SerializedProperty arrayProperty = _menuController.FindProperty("_mcMenus");
+            for (int i = 0; i < arrayProperty.arraySize; i++)
+            {
                 EditorGUILayout.BeginHorizontal();
-                if (GUILayout.Button("Search for MenuController"))
+                EditorGUILayout.PropertyField(arrayProperty.GetArrayElementAtIndex(i));
+                if (GUILayout.Button("Remove"))
                 {
-                    MenuController menuController = GameObject.FindObjectOfType<MenuController>();
-
-                    if (menuController)
-                    {
-                        SetMenuController(menuController);
-                    }
-                }
-                if (GUILayout.Button("Add MenuController component to first canvas"))
-                {
-                    Canvas firstCanvas = GameObject.FindObjectOfType<Canvas>();
-
-                    if (firstCanvas)
-                    {
-                        SetMenuController(firstCanvas.gameObject.AddComponent<MenuController>());
-                    }
+                    RemoveMenuFromController(i);
                 }
                 EditorGUILayout.EndHorizontal();
+            }
+            EditorGUILayout.Space();
+            _menuController.ApplyModifiedProperties();
 
-                everythingIsPerfect = false;
-            }
-            if (everythingIsPerfect)
+            DragDrop.DrawDragDrop("Drag menus to add them", objects =>
             {
-                EditorGUILayout.HelpBox("Seems like everything is fine! Enjoy ;)", MessageType.Info);
-            }
+                foreach (Object dropObject in objects)
+                {
+                    GameObject gameObject = dropObject as GameObject;
+                    if (gameObject)
+                    {
+                        MCMenu mcMenu = gameObject.GetComponentInChildren<MCMenu>();
+                        AddMenuToController(mcMenu);
+                    }
+                }
+            }, 40);
+
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+            EditorGUILayout.Space();
+
+            EditorGUILayout.LabelField("General menus", EditorStyles.boldLabel);
+
+            // TODO: Show general Menus
+
+            EditorGUILayout.Space();
+
+            DragDrop.DrawDragDrop("Drag menus to add them", objects =>
+            {
+                foreach (Object dropObject in objects)
+                {
+                    GameObject gameObject = dropObject as GameObject;
+                    if (gameObject)
+                    {
+                        MCMenu mcMenu = gameObject.GetComponentInChildren<MCMenu>();
+                        AddMenuToController(mcMenu);
+                    }
+                }
+            }, 40);
         }
 
         /// <summary>
@@ -145,52 +220,6 @@ namespace WeersProductions
                     CreateMenu(_presets[_selectedPreset]);
                 }
             }
-
-            EditorGUILayout.Space();
-            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-            EditorGUILayout.Space();
-            if (_menuController == null)
-            {
-                EnsureSettingsObject();
-                if (!_editorMenuCreatorSettings.MenuController)
-                {
-                    EditorGUILayout.HelpBox("You do not have set the MenuController yet, you can do this in the first tab. This will allow you to control all your menus here.", MessageType.Info);
-                    return;
-                }
-                _menuController = new SerializedObject(_editorMenuCreatorSettings.MenuController);
-            }
-            EditorGUILayout.LabelField("Add existing menus");
-
-            DragDrop.DrawDragDrop("Drag menus to add them", objects =>
-            {
-                foreach (Object dropObject in objects)
-                {
-                    GameObject gameObject = dropObject as GameObject;
-                    if (gameObject)
-                    {
-                        MCMenu mcMenu = gameObject.GetComponentInChildren<MCMenu>();
-                        AddMenuToController(mcMenu);
-                    }
-                }
-            });
-
-            _showMenuList = EditorGUILayout.Foldout(_showMenuList, "Current menus");
-            if (_showMenuList)
-            {
-                _menuController.Update();
-                SerializedProperty arrayProperty = _menuController.FindProperty("_mcMenus");
-                for (int i = 0; i < arrayProperty.arraySize; i++)
-                {
-                    EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.PropertyField(arrayProperty.GetArrayElementAtIndex(i));
-                    if (GUILayout.Button("Remove"))
-                    {
-                        RemoveMenuFromController(i);
-                    }
-                    EditorGUILayout.EndHorizontal();
-                }
-                _menuController.ApplyModifiedProperties();
-            }
         }
 
         /// <summary>
@@ -199,7 +228,7 @@ namespace WeersProductions
         /// <param name="menuCreatorPreset"></param>
         private void CreateMenu(MenuCreatorPreset menuCreatorPreset)
         {
-            GameObject newMenu = Instantiate(menuCreatorPreset.PresetObject, _currentSelectedMenuController.transform);
+            GameObject newMenu = Instantiate(menuCreatorPreset.PresetObject, _editorMenuCreatorSettings.MenuController.transform);
             Undo.RegisterCreatedObjectUndo(newMenu, "Created menu");
 
             MCMenu mcMenu = newMenu.GetComponentInChildren<MCMenu>();
@@ -350,20 +379,6 @@ namespace WeersProductions
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             return menuCreatorPreset;
-        }
-
-        /// <summary>
-        /// Draws the options panel.
-        /// </summary>
-        private void DrawOptions()
-        {
-            _editorMenuCreatorSettings.MenuController = (MenuController)EditorGUILayout.ObjectField("Menu Controller",
-                _editorMenuCreatorSettings.MenuController, typeof(MenuController), true);
-
-            if (GUI.changed)
-            {
-                EditorUtility.SetDirty(_editorMenuCreatorSettings);
-            }
         }
 
         /// <summary>
