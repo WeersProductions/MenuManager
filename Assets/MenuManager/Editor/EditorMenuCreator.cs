@@ -133,6 +133,7 @@ namespace WeersProductions
             if (!_editorMenuCreatorSettings.MenuController)
             {
                 EditorGUILayout.HelpBox("First select a MenuController.", MessageType.Info);
+                // TODO: still show shared menus
                 return;
             }
             
