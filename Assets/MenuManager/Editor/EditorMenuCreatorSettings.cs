@@ -24,19 +24,14 @@ namespace WeersProductions
             {
                 Debug.LogError("You seem to have deleted the <EditorMenuCreatorSettings> file from the Resources folder. A new one will be generated, you can move this one around as long as its in a <Resources> folder.");
 
-                // Get the current directory and use that to create the settings object relatively.
-                string path = Directory.GetCurrentDirectory();
-                string finalPath = Path.Combine(path, "Resources");
+                Directory.CreateDirectory(MenuControllerSharedProps.RESOURCE_PATH);
 
-                // Since the AssetDatabase only wants relative paths, remove the first part.
-                finalPath = string.Format("Assets{0}", finalPath.Replace(Application.dataPath, "").Replace('\\', '/'));
+                string path = Path.Combine(MenuControllerSharedProps.RESOURCE_PATH, "EditorMenuCreatorSettings.asset");
 
-                Debug.Log(string.Format("Creating settingsobject in: {0}", finalPath));
-
-                Directory.CreateDirectory(finalPath);
+                Debug.Log(string.Format("Creating settingsobject in: {0}", path));
 
                 EditorMenuCreatorSettings settingsAsset = CreateInstance<EditorMenuCreatorSettings>();
-                AssetDatabase.CreateAsset(settingsAsset, finalPath);
+                AssetDatabase.CreateAsset(settingsAsset, path);
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
                 return settingsAsset;
@@ -95,9 +90,9 @@ namespace WeersProductions
                 else
                 {
                     // We don't have any presets and no customPresetFolder is set. Return the default relative folder.
-                    string path = Directory.GetCurrentDirectory();
-                    Directory.CreateDirectory(path);
-                    result = Path.Combine(path, "Resources/Presets");
+                    result = Path.Combine(MenuControllerSharedProps.RESOURCE_PATH, "Presets");
+                    // TODO: check if we should use 'result' here in CreateDirectory or not
+                    Directory.CreateDirectory(MenuControllerSharedProps.RESOURCE_PATH);
                 }
             }
             return string.Format("Assets{0}", result.Replace(Application.dataPath, "").Replace('\\', '/'));

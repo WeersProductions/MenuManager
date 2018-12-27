@@ -86,6 +86,12 @@ namespace WeersProductions
                 _menus.Add(_mcMenus[i].Id, _mcMenus[i]);
             }
 
+            // Add the shared menus.
+            MCMenu[] sharedMenus = MenuControllerSharedProps.GetSharedMenus();
+            for(int i = 0; i < sharedMenus.Length; i++) {
+                _menus.Add(sharedMenus[i].Id, sharedMenus[i]);
+            }
+
             // Create the object that checks clicking outside of the current menu.
             _clickOutsideMenu = CreateOutsideMenuObject();
         }

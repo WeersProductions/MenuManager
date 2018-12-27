@@ -40,6 +40,9 @@ namespace WeersProductions
         private string[] _availableMenuControllersLabels;
 
         private EditorMenuCreatorSettings _editorMenuCreatorSettings;
+
+        private MenuControllerSharedProps _menuControllerSharedProps;
+        private SerializedObject _menuControllerSharedPropsObject;
         #endregion
 
         #endregion
@@ -60,6 +63,7 @@ namespace WeersProductions
                 {"Create menu", DrawCreateMenu },
                 {"Create preset", DrawCreatePreset }
             });
+            UpdateAvailableMenuControllers();
         }
 
         private void OnFocus()
@@ -81,6 +85,7 @@ namespace WeersProductions
 
         private void UpdateAvailableMenuControllers()
         {
+            EnsureSettingsObject();
             // TODO: support MenuControllers in prefabs?
             _availableMenuControllers = HierarchyHelper.GetObjectsOfType<MenuController>();
             int labelSize = _availableMenuControllers.Length;
@@ -131,7 +136,7 @@ namespace WeersProductions
                 return;
             }
             
-            EditorGUILayout.LabelField("Current menus", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Specific menus", EditorStyles.boldLabel);
             EditorGUILayout.Space();
 
             _menuController.Update();
@@ -169,6 +174,20 @@ namespace WeersProductions
             EditorGUILayout.LabelField("General menus", EditorStyles.boldLabel);
 
             // TODO: Show general Menus
+            EnsureSharedProps();
+
+            _menuControllerSharedPropsObject.Update();
+            SerializedProperty sharedMenusProperty = _menuControllerSharedPropsObject.FindProperty("_menus");
+            for (int i = 0; i < sharedMenusProperty.arraySize; i++) {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.PropertyField(sharedMenusProperty.GetArrayElementAtIndex(i));
+                if(GUILayout.Button("Remove"))
+                {
+                    RemoveSharedMenuFromController(i);
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+            _menuControllerSharedPropsObject.ApplyModifiedProperties();
 
             EditorGUILayout.Space();
 
@@ -180,7 +199,7 @@ namespace WeersProductions
                     if (gameObject)
                     {
                         MCMenu mcMenu = gameObject.GetComponentInChildren<MCMenu>();
-                        AddMenuToController(mcMenu);
+                        AddSharedMenuToController(mcMenu);
                     }
                 }
             }, 40);
@@ -244,6 +263,9 @@ namespace WeersProductions
         /// <param name="mcMenu"></param>
         private void AddMenuToController(MCMenu mcMenu)
         {
+            if(!mcMenu) {
+                return;
+            }
             if (_editorMenuCreatorSettings.MenuController)
             {
                 if (_menuController == null)
@@ -256,6 +278,17 @@ namespace WeersProductions
                 menuArray.GetArrayElementAtIndex(menuArray.arraySize - 1).objectReferenceValue = mcMenu;
                 _menuController.ApplyModifiedProperties();
             }
+        }
+
+        private void AddSharedMenuToController(MCMenu mcMenu) {
+            if(!mcMenu) {
+                return;
+            }
+            
+            SerializedProperty sharedProps = _menuControllerSharedPropsObject.FindProperty("_menus");
+            sharedProps.arraySize += 1;
+            sharedProps.GetArrayElementAtIndex(sharedProps.arraySize - 1).objectReferenceValue = mcMenu;
+            _menuControllerSharedPropsObject.ApplyModifiedProperties();
         }
 
         /// <summary>
@@ -281,6 +314,19 @@ namespace WeersProductions
                 }
                 _menuController.ApplyModifiedProperties();
             }
+        }
+
+        private void RemoveSharedMenuFromController(int index)
+        {
+            SerializedProperty menuArray = _menuControllerSharedPropsObject.FindProperty("_menus");
+            int arraySize = menuArray.arraySize;
+            menuArray.DeleteArrayElementAtIndex(index);
+            if (menuArray.arraySize == arraySize)
+            {
+                // Hotfix, because of: https://answers.unity.com/questions/555724/serializedpropertydeletearrayelementatindex-leaves.html 
+                menuArray.DeleteArrayElementAtIndex(index);
+            }
+            _menuControllerSharedPropsObject.ApplyModifiedProperties();
         }
 
         /// <summary>
@@ -414,6 +460,7 @@ namespace WeersProductions
         }
 
         /// <summary>
+        /// TODO: use OnWillDeleteAsset to ensure it gets recreated if the user deletes it manually. (or AssetPostprocessor.OnPostprocessAllAssets)
         /// If no settings file exists, it will create one, otherwise it will use the existing one.
         /// </summary>
         private void CreateOrLoadSettings()
@@ -438,9 +485,21 @@ namespace WeersProductions
             {
                 return;
             }
-            EditorMenuCreatorSettings settingsAsset = EditorMenuCreatorSettings.GetEditorMenuCreatorSettings();
+            _editorMenuCreatorSettings = EditorMenuCreatorSettings.GetEditorMenuCreatorSettings();
+        }
 
-            _editorMenuCreatorSettings = settingsAsset;
+        private void EnsureSharedProps() 
+        {
+            if(_menuControllerSharedProps)
+            {
+                if(_menuControllerSharedPropsObject == null) 
+                {
+                    _menuControllerSharedPropsObject = new SerializedObject(_menuControllerSharedProps);
+                }
+                return;
+            }
+            _menuControllerSharedProps = MenuControllerSharedProps.GetOrCreateInstance();
+            _menuControllerSharedPropsObject = new SerializedObject(_menuControllerSharedProps);
         }
 
         /// <summary>
