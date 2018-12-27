@@ -172,7 +172,7 @@ namespace WeersProductions
             EditorGUILayout.Space();
 
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("General menus", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Shared menus", EditorStyles.boldLabel);
             EditorGUILayout.Space();
             if(GUILayout.Button("", GUI.skin.GetStyle("IN ObjectField")))
             {
