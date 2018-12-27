@@ -171,7 +171,14 @@ namespace WeersProductions
             EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
             EditorGUILayout.Space();
 
+            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("General menus", EditorStyles.boldLabel);
+            EditorGUILayout.Space();
+            if(GUILayout.Button("", GUI.skin.GetStyle("IN ObjectField")))
+            {
+                EditorGUIUtility.PingObject(_menuControllerSharedProps);
+            }
+            EditorGUILayout.EndHorizontal();
 
             // TODO: Show general Menus
             EnsureSharedProps();
@@ -284,7 +291,7 @@ namespace WeersProductions
             if(!mcMenu) {
                 return;
             }
-            
+
             SerializedProperty sharedProps = _menuControllerSharedPropsObject.FindProperty("_menus");
             sharedProps.arraySize += 1;
             sharedProps.GetArrayElementAtIndex(sharedProps.arraySize - 1).objectReferenceValue = mcMenu;
