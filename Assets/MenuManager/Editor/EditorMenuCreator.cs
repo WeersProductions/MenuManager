@@ -130,47 +130,48 @@ namespace WeersProductions
 
         private void DrawManageMenus() 
         {
-            if (!_editorMenuCreatorSettings.MenuController)
+            bool hasMenuControllerSelected = _editorMenuCreatorSettings.MenuController;
+            if (!hasMenuControllerSelected)
             {
-                EditorGUILayout.HelpBox("First select a MenuController.", MessageType.Info);
-                // TODO: still show shared menus
-                return;
+                EditorGUILayout.HelpBox("Select a MenuController to change specific menus.", MessageType.Info);
             }
             
-            EditorGUILayout.LabelField("Specific menus", EditorStyles.boldLabel);
-            EditorGUILayout.Space();
+            if(hasMenuControllerSelected) {
+                EditorGUILayout.LabelField("Specific menus", EditorStyles.boldLabel);
+                EditorGUILayout.Space();
 
-            _menuController.Update();
-            SerializedProperty arrayProperty = _menuController.FindProperty("_mcMenus");
-            for (int i = 0; i < arrayProperty.arraySize; i++)
-            {
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.PropertyField(arrayProperty.GetArrayElementAtIndex(i));
-                if (GUILayout.Button("Remove"))
+                _menuController.Update();
+                SerializedProperty arrayProperty = _menuController.FindProperty("_mcMenus");
+                for (int i = 0; i < arrayProperty.arraySize; i++)
                 {
-                    RemoveMenuFromController(i);
-                }
-                EditorGUILayout.EndHorizontal();
-            }
-            EditorGUILayout.Space();
-            _menuController.ApplyModifiedProperties();
-
-            DragDrop.DrawDragDrop("Drag menus to add them", objects =>
-            {
-                foreach (Object dropObject in objects)
-                {
-                    GameObject gameObject = dropObject as GameObject;
-                    if (gameObject)
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.PropertyField(arrayProperty.GetArrayElementAtIndex(i));
+                    if (GUILayout.Button("Remove"))
                     {
-                        MCMenu mcMenu = gameObject.GetComponentInChildren<MCMenu>();
-                        AddMenuToController(mcMenu);
+                        RemoveMenuFromController(i);
                     }
+                    EditorGUILayout.EndHorizontal();
                 }
-            }, 40);
+                EditorGUILayout.Space();
+                _menuController.ApplyModifiedProperties();
 
-            EditorGUILayout.Space();
-            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-            EditorGUILayout.Space();
+                DragDrop.DrawDragDrop("Drag menus to add them", objects =>
+                {
+                    foreach (Object dropObject in objects)
+                    {
+                        GameObject gameObject = dropObject as GameObject;
+                        if (gameObject)
+                        {
+                            MCMenu mcMenu = gameObject.GetComponentInChildren<MCMenu>();
+                            AddMenuToController(mcMenu);
+                        }
+                    }
+                }, 40);
+
+                EditorGUILayout.Space();
+                EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+                EditorGUILayout.Space();
+            }
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Shared menus", EditorStyles.boldLabel);
