@@ -59,7 +59,6 @@ namespace WeersProductions
                     coordinates = current.mousePosition;
                 }
             }
-            Debug.Log(coordinates);
             return GUIUtility.GUIToScreenPoint(coordinates);
         }
     }
