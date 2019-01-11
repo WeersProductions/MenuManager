@@ -44,7 +44,7 @@ namespace WeersProductions
         public static Vector2 GetMousePosition() 
         {
             if(Event.current != null) {
-                return Event.current.mousePosition;
+                return GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
             }
 
             Vector2 coordinates = new Vector2(Screen.width / 2, Screen.height / 2);
@@ -57,7 +57,8 @@ namespace WeersProductions
                     coordinates = current.mousePosition;
                 }
             }
-            return coordinates;
+            Debug.Log(coordinates);
+            return GUIUtility.GUIToScreenPoint(coordinates);
         }
     }
 }
