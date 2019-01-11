@@ -10,7 +10,9 @@ namespace WeersProductions
 		/// </summary>
 		public void ShowMenu1()
 		{
+			// Create our data-class.
 			GeneralWindowData data = new GeneralWindowData("This is menu 1", Color.gray, new string[]{"button 1", "button 2", "button3"}, new string[]{"Pressed 1", "Pressed 2", "Pressed 3"});
+			// Pass it to the specific menu.
 			this.MenuController.ShowMenu(MenuController.Menus.GENERALWINDOW, data);
 		}
 

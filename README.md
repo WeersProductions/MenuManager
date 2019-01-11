@@ -68,48 +68,34 @@ If your project contains a lot of menus, presets might help you organize them.
 2. Drag your menu prefab to the 'Preset Object' field at the bottom of the editor. 
 3. Go to the tab ```Create menu```, select your new preset and click ```Create Menu```. This will instantiate a new object for the current selected MenuController. Edit this, and follow 'Adding a new menu' to use it. 
 
+## Good practice
+### Data-flow
+The main structure when looking at the data-flow when showing a new menu is as follows:
+1. Create a new ```data``` object. This will contain data for the specific menu. Think of an object that contains the following properties:
+    - Message
+    - Color of the message
+    - An icon that should be displayed next to the message
 
-## Example
+    Example files:
+    - [GeneralWindowData](./Assets/MenuManager/Demo/GeneralWindowData.cs)
+    - [PopupData](./Assets/MenuManager/Scripts/CustomPresets/MCSimplePopupData.cs)
+ 
+ 2. This data will be send to your menu class, that inherits from ```McMenu```. This class will use the data from the data object to show specific things on screen. In our example, think of a Message class that will set a UI Text component's text to the Message property, its color to the Color property and sets a UI Image component's Sprite property to the Icon that is sent. 
+ 
+    Example files:
+    - [GeneralWindow](./Assets/MenuManager/Demo/GeneralWindow.cs)
+    - [Popup](./Assets/MenuManager/Scripts/CustomPresets/MCSimplePopup.cs)
 
-![A gif showing the demo](https://user-images.githubusercontent.com/22612711/32513569-d6973cc6-c3fa-11e7-9106-eada8ba07e85.gif)
+ 
+ You can see a very simple example in [MainWindow](./Assets/MenuManager/Demo/MultipleMenuControllers/Scripts/MainWindow.cs) of how to create a data object and use it when showing a menu.
 
-This is all the code you need to create it!
-```csharp
-private void Start()
-{
-    CreatePopup(0, null);
-}
+## Demos
 
-private void CreatePopup(int count, MCMenu parent)
-{
-    // Get the Menu object, we need this because we have a button that closes the menu.
-    MCMenu popupMenu = MenuController.GetMenuGlobal(MenuController.Menus.SIMPLEPOPUP);
+Achieve interesting menu set-ups with very little code. Click on the demos to go to the demo readme with more explanation. 
 
-    // Create the data for the menu.
-    MCSimplePopupData simplePopupData = new MCSimplePopupData("title " + count, "This is another popup.",
-        new MCButtonData[]
-        {
-            new MCButtonData("New popup", button => { CreatePopup(count + 1, popupMenu); }, null, true, "Creates a new popup"),
-            new MCButtonData("Tooltip", null, null, true, "Simply shows the tooltip working"),
-            new MCButtonData("Close parent", button => { MenuController.HideMenuGlobal(popupMenu.Parent); }, null, true, "Closes the parent menu (which will close all children)"),
-            new MCButtonData("Close this", button => popupMenu.Hide(), null, true, "Closes this popup")
-        });
+| | |
+|:-------------------------:|:-------------------------:|
+| <a href="./Assets/MenuManager/Demo/MultipleMenuControllers/readme.md"><img width="600" alt="Popups" src="https://user-images.githubusercontent.com/22612711/51031348-975c4980-159c-11e9-80c5-d14a1079f813.png"> Multiple Managers</a> | <a href="./Assets/MenuManager/Demo/Popups/readme.md"><img width="600" alt="Multiple managers" src="https://user-images.githubusercontent.com/22612711/51031529-21a4ad80-159d-11e9-8b3e-95b0584f8239.png"> Popups</a> |
 
-    if (parent)
-    {
-        parent.AddPopup(popupMenu, simplePopupData);
-    }
-    else
-    {
-        // Add the popup to the screen, when there is nothing on the screen it will be added as a menu instead of a popup. 
-        MenuController.AddPopupGlobal(popupMenu, true, simplePopupData);
 
-        // In case you have a specific menucontroller that you want to use:
-        // yourMenuController.AddPopup(popupMenu, true, simplePopupData);
-    }
-}
-```
-
-Take a look at the example code and the custom MCMenu classes, ```MCSimplePopup``` and ```MCSimpleToolTip```. These get additional data when they are shown, ```MCSimplePopupData``` and ```MCSimpleTooltipData```. 
-
-If you have any questions of how to use this, or any suggestions to add, don't hesitate to send me a message!
+If you have any questions of how to use this, or any suggestions on what features are missing, don't hesitate to send me a message!
