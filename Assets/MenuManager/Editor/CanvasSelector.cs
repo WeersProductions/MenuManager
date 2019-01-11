@@ -30,8 +30,14 @@ namespace WeersProductions
 			
 			for(int i = 0; i < _canvasses.Length; i++) {
 				int index = i;
-				// TODO: Add warning if canvas already contains a MenuController
-				if(GUILayout.Button(_canvasses[i].name)) {
+				string buttonName = _canvasses[i].name;
+
+				MenuController _menuController = _canvasses[i].GetComponent<MenuController>();
+				if(_menuController) {
+					// This Canvas already contains a MenuController.
+					buttonName += " (already has a MenuController)";
+				}
+				if(GUILayout.Button(buttonName)) {
 					editorWindow.Close();
 					_onSelected(_canvasses[index]);
 				}
