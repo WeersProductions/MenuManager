@@ -182,7 +182,6 @@ namespace WeersProductions
             }
             EditorGUILayout.EndHorizontal();
 
-            // TODO: Show general Menus
             EnsureSharedProps();
 
             _menuControllerSharedPropsObject.Update();
@@ -416,7 +415,6 @@ namespace WeersProductions
         /// <returns></returns>
         private MenuCreatorPreset CreatePreset(string newFileName)
         {
-            // TODO: check if this file already exists.
             if (string.IsNullOrEmpty(newFileName))
             {
                 CreatePreset("newPreset");
@@ -425,7 +423,7 @@ namespace WeersProductions
             Debug.Log("Creating at: " + path);
             if (AssetDatabase.LoadAssetAtPath(path, typeof(MenuCreatorPreset)))
             {
-                CreatePreset(newFileName + "_");
+                return CreatePreset(newFileName + "_");
             }
 
             MenuCreatorPreset menuCreatorPreset = CreateInstance<MenuCreatorPreset>();
