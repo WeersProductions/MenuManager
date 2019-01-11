@@ -38,7 +38,6 @@ namespace WeersProductions
                 // Show a popup so the user can choose what menuController to use.
                 try {
                     Vector2 coordinates = EditorUtils.GetMousePosition();
-                    // TODO: fix popup location.
                     PopupWindow.Show(new Rect(GUIUtility.ScreenToGUIPoint(coordinates), new Vector2(250, 150)), new MenuControllerSelector(menuControllers, (MenuController menuController) => {
                     AddMenuToTransform(menuController.transform);
                 }));

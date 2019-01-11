@@ -4,7 +4,6 @@ using UnityEngine;
 namespace WeersProductions
 {
     /// <summary>
-    /// TODO: Get all active MenuControllers
     /// TODO: Allow names for MenuControllers with string look-up
     /// </summary>
     public class MenuController : MonoBehaviour
@@ -580,6 +579,15 @@ namespace WeersProductions
         public static bool AnyMenuActiveGlobal()
         {
             return _instance.AnyMenuActive();
+        }
+
+        /// <summary>
+        /// Very expensive, store the results instead of calling it every time.
+        /// </summary>
+        /// <returns></returns>
+        public static MenuController[] GetAllActiveMenuControllers()
+        {
+            return GameObject.FindObjectsOfType(typeof(MenuController)) as MenuController[];
         }
 #endregion
     }
