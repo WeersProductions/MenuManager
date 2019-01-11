@@ -82,12 +82,20 @@ namespace WeersProductions
             // For faster referencing, convert the array to a dictionary for run-time use.
             for (int i = 0; i < _mcMenus.Length; i++)
             {
+                if(_menus.ContainsKey(_mcMenus[i].Id)) {
+                    Debug.LogError(string.Format("This menu could not be added, since this canvas ({0}) already contains a key for {1}", this.name, _mcMenus[i].Id));
+                    continue;
+                }
                 _menus.Add(_mcMenus[i].Id, _mcMenus[i]);
             }
 
             // Add the shared menus.
             MCMenu[] sharedMenus = MenuControllerSharedProps.GetSharedMenus();
             for(int i = 0; i < sharedMenus.Length; i++) {
+                if(_menus.ContainsKey(sharedMenus[i].Id)) {
+                    Debug.LogError(string.Format("This shared menu could not be added, since this canvas ({0}) already contains a key for {1}", this.name, sharedMenus[i].Id));
+                    continue;
+                }
                 _menus.Add(sharedMenus[i].Id, sharedMenus[i]);
             }
 

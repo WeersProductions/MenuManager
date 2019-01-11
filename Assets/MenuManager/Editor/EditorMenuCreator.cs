@@ -83,6 +83,9 @@ namespace WeersProductions
             _tabsBlock.Draw();
         }
 
+        /// <summary>
+        /// TODO: now only called when hierarchy changes, not when a new prefab is dragged into the scene.
+        /// </summary>
         private void UpdateAvailableMenuControllers()
         {
             EnsureSettingsObject();
