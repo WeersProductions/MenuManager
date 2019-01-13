@@ -1,6 +1,6 @@
 # Popups and tooltips
 
-![demomultiplecontrollers2](https://user-images.githubusercontent.com/22612711/51030801-ca9dd900-159a-11e9-9b3b-fcce2c59cdd9.gif)
+![demopopups_1](https://user-images.githubusercontent.com/22612711/51090409-d85e8480-177b-11e9-98b2-fda47816d8d3.gif)
 
 This is all the code you need to create it!
 ```csharp
