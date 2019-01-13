@@ -64,8 +64,6 @@ namespace WeersProductions
         [SerializeField]
         private bool _alwaysOnTop;
 
-        //TODO: Add pool amount if it should be pooled (E.G. max 5 objects in pool).
-
         /// <summary>
         /// A list of popups that this menu owns.
         /// These will be closed when this menu will be closed.
@@ -90,7 +88,7 @@ namespace WeersProductions
         /// <summary>
         /// If true this screen is active and visible.
         /// </summary>
-        private bool _isActive;
+        protected bool _isActive;
 
         public MenuController.Menus Id
         {

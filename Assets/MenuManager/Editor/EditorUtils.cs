@@ -1,6 +1,7 @@
 ﻿
 using UnityEditor;
 using UnityEngine;
+using System.Reflection;
 
 namespace WeersProductions
 {
@@ -34,6 +35,31 @@ namespace WeersProductions
         private static void FocusOnWindow(string window)
         {
             EditorApplication.ExecuteMenuItem("Window/" + window);
+        }
+
+        /// <summary>
+        /// TODO: improve location. There is an offset to the mouseposition. 
+        /// When right clicking it is because it takes the right mouseclick to open the contextmenu
+        /// as the last click, instead of the left click on a button. 
+        /// </summary>
+        /// <returns>The center of the screen if no mouseposition could be found.</returns>
+        public static Vector2 GetMousePosition() 
+        {
+            if(Event.current != null) {
+                return GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
+            }
+
+            Vector2 coordinates = new Vector2(Screen.width / 2, Screen.height / 2);
+            FieldInfo field = typeof ( Event ).GetField ( "s_Current", BindingFlags.Static | BindingFlags.NonPublic );
+            if ( field != null )
+            {
+                Event current = field.GetValue ( null ) as Event;
+                if ( current != null )
+                {
+                    coordinates = current.mousePosition;
+                }
+            }
+            return GUIUtility.GUIToScreenPoint(coordinates);
         }
     }
 }
