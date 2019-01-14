@@ -77,13 +77,13 @@ The main structure when looking at the data-flow when showing a new menu is as f
     - An icon that should be displayed next to the message
 
     Example files:
-    - [GeneralWindowData](./Assets/MenuManager/Demo/GeneralWindowData.cs)
+    - [GeneralWindowData](./Assets/MenuManager/Demo/MultipleMenuControllers/Scripts/GeneralWindowData.cs)
     - [PopupData](./Assets/MenuManager/Scripts/CustomPresets/MCSimplePopupData.cs)
  
  2. This data will be send to your menu class, that inherits from ```McMenu```. This class will use the data from the data object to show specific things on screen. In our example, think of a Message class that will set a UI Text component's text to the Message property, its color to the Color property and sets a UI Image component's Sprite property to the Icon that is sent. 
  
     Example files:
-    - [GeneralWindow](./Assets/MenuManager/Demo/GeneralWindow.cs)
+    - [GeneralWindow](./Assets/MenuManager/Demo/MultipleMenuControllers/Scripts/GeneralWindow.cs)
     - [Popup](./Assets/MenuManager/Scripts/CustomPresets/MCSimplePopup.cs)
 
  
