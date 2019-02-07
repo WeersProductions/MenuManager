@@ -77,17 +77,17 @@ The main structure when looking at the data-flow when showing a new menu is as f
     - An icon that should be displayed next to the message
 
     Example files:
-    - [GeneralWindowData](./Assets/MenuManager/Demo/MultipleMenuControllers/Scripts/GeneralWindowData.cs)
-    - [PopupData](./Assets/MenuManager/Scripts/CustomPresets/MCSimplePopupData.cs)
+    - [GeneralWindowData](./Demo/MultipleMenuControllers/Scripts/GeneralWindowData.cs)
+    - [PopupData](./Scripts/CustomPresets/MCSimplePopupData.cs)
  
  2. This data will be send to your menu class, that inherits from ```McMenu```. This class will use the data from the data object to show specific things on screen. In our example, think of a Message class that will set a UI Text component's text to the Message property, its color to the Color property and sets a UI Image component's Sprite property to the Icon that is sent. 
  
     Example files:
-    - [GeneralWindow](./Assets/MenuManager/Demo/MultipleMenuControllers/Scripts/GeneralWindow.cs)
-    - [Popup](./Assets/MenuManager/Scripts/CustomPresets/MCSimplePopup.cs)
+    - [GeneralWindow](./Demo/MultipleMenuControllers/Scripts/GeneralWindow.cs)
+    - [Popup](./Scripts/CustomPresets/MCSimplePopup.cs)
 
  
- You can see a very simple example in [MainWindow](./Assets/MenuManager/Demo/MultipleMenuControllers/Scripts/MainWindow.cs) of how to create a data object and use it when showing a menu.
+ You can see a very simple example in [MainWindow](./Demo/MultipleMenuControllers/Scripts/MainWindow.cs) of how to create a data object and use it when showing a menu.
 
 ## Demos
 
@@ -95,7 +95,7 @@ Achieve interesting menu set-ups with very little code. Click on the demos to go
 
 | | |
 |:-------------------------:|:-------------------------:|
-| <a href="./Assets/MenuManager/Demo/MultipleMenuControllers/readme.md"><img width="600" alt="Popups" src="https://user-images.githubusercontent.com/22612711/51031348-975c4980-159c-11e9-80c5-d14a1079f813.png"> Multiple Managers</a> | <a href="./Assets/MenuManager/Demo/Popups/readme.md"><img width="600" alt="Multiple managers" src="https://user-images.githubusercontent.com/22612711/51031529-21a4ad80-159d-11e9-8b3e-95b0584f8239.png"> Popups</a> |
+| <a href="./Demo/MultipleMenuControllers/readme.md"><img width="600" alt="Popups" src="https://user-images.githubusercontent.com/22612711/51031348-975c4980-159c-11e9-80c5-d14a1079f813.png"> Multiple Managers</a> | <a href="./Demo/Popups/readme.md"><img width="600" alt="Multiple managers" src="https://user-images.githubusercontent.com/22612711/51031529-21a4ad80-159d-11e9-8b3e-95b0584f8239.png"> Popups</a> |
 
 
 If you have any questions of how to use this, or any suggestions on what features are missing, don't hesitate to send me a message!
