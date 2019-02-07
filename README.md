@@ -5,7 +5,9 @@ With just a small amount of code you can create relations between different menu
 
 # Getting started
 ## Set-up
-Clone the repository, or download a UnityPackage from the [forums](https://forum.unity.com/threads/wip-open-source-menumanager.503537/). Open te project in Unity. The ```MenuManager``` folder contains all the code required to use the manager.
+Clone the repository, use it as a git submodule or download a UnityPackage from the [forums](https://forum.unity.com/threads/wip-open-source-menumanager.503537/). Open te project in Unity. This repository contains all the code you want to include in your project under the 'Assets' folder.
+### Git Submodule
+This is the prefered way. Your current project will be your git repository and the MenuManager will be a submodule. This means it can be updated using git, but won't be in your way when managing your own repositories. To do this, go to the folder that contains all your packages (you can for example create a folder 'Imported' under 'Assets') and run the command `git submodule add https://github.com/WeersProductions/MenuManager.git` in your git terminal. To update it, run `git submodule update`.
 
 ## Demo
 In the Demo folder two demos show you how to use the MenuManager.
