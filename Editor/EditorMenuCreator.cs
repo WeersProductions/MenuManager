@@ -293,12 +293,24 @@ namespace WeersProductions
 
         private void AddSharedMenuToController(MCMenu mcMenu) {
             if(!mcMenu) {
+                this.ShowNotification(new GUIContent("This does not contain a MCMenu component."));
+                return;
+            }
+            PrefabType prefabType = PrefabUtility.GetPrefabType(mcMenu);
+            if(prefabType == PrefabType.None) {
+                this.ShowNotification(new GUIContent("Please use prefabs for shared menus."));
                 return;
             }
 
+            Object prefab = mcMenu;
+            if(prefabType == PrefabType.PrefabInstance) {
+                prefab = PrefabUtility.GetCorrespondingObjectFromSource(mcMenu);
+            }
+
+            _menuControllerSharedPropsObject.Update();
             SerializedProperty sharedProps = _menuControllerSharedPropsObject.FindProperty("_menus");
             sharedProps.arraySize += 1;
-            sharedProps.GetArrayElementAtIndex(sharedProps.arraySize - 1).objectReferenceValue = mcMenu;
+            sharedProps.GetArrayElementAtIndex(sharedProps.arraySize - 1).objectReferenceValue = prefab;
             _menuControllerSharedPropsObject.ApplyModifiedProperties();
         }
 
