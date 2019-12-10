@@ -90,6 +90,11 @@ namespace WeersProductions
         /// </summary>
         protected bool _isActive;
 
+        /// <summary>
+        /// If true this screen is active and visible.
+        /// </summary>
+        public bool IsActive => _isActive;
+
         public MenuController.Menus Id
         {
             get { return _id; }
