@@ -30,6 +30,7 @@ namespace WeersProductions
 		public static MenuControllerSharedProps GetOrCreateInstance() {
 			MenuControllerSharedProps instance = GetInstance();
 			if(!instance) {
+				#if UNITY_EDITOR
                 Debug.Log(string.Format("Creating MenuControllerSharedProps in: {0}", RESOURCE_PATH));
                 Directory.CreateDirectory(RESOURCE_PATH);
 
@@ -39,6 +40,9 @@ namespace WeersProductions
                 AssetDatabase.CreateAsset(instance, path);
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
+                #else
+                Debug.LogError("Could not find MenuControllerSharedProps. Run this in the editor to create an asset.");
+                #endif
 			}
 			return instance;
 		}
