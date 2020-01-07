@@ -117,9 +117,6 @@ namespace WeersProductions
             outsideMenuRect.sizeDelta = Vector2.zero;
             outsideMenuRect.anchorMin = Vector2.zero;
             outsideMenuRect.anchorMax = Vector2.one;
-            // outsideMenuRect.position = Vector3.zero;
-            // outsideMenuRect.rotation = Quaternion.identity;
-            // outsideMenuRect.localScale = Vector3.one;
             outsideMenuGameObject.SetActive(false);
             return outsideMenuGameObject.AddComponent<NonDrawingGraphic>();
         }
