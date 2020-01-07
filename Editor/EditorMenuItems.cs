@@ -71,7 +71,7 @@ namespace WeersProductions
         /// <summary>
         /// Shows popup for the user to choose a Canvas that will be used and adds a MenuController component to it.
         /// </summary>
-        private static void CreateMenuController(UnityEngine.Events.UnityAction<MenuController> onFinish) {
+        public static void CreateMenuController(UnityEngine.Events.UnityAction<MenuController> onFinish) {
             Canvas[] canvasses = HierarchyHelper.GetSelectedOrGeneralObjectsOfType<Canvas>();
             Vector2 coordinates = EditorUtils.GetMousePosition();
             try {

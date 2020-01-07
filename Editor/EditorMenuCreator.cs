@@ -122,7 +122,19 @@ namespace WeersProductions
             if(_availableMenuControllers == null || _availableMenuControllers.Length <= 0) {
                 EditorGUILayout.HelpBox("No MenuControllers in this scene.", MessageType.Warning);
                 if(GUILayout.Button("Create MenuController")) {
-                    EditorApplication.ExecuteMenuItem("GameObject/WeersProductions/MenuController");
+                    //EditorApplication.ExecuteMenuItem("GameObject/WeersProductions/MenuController");
+                    EditorMenuItems.CreateMenuController((newMenuController =>
+                    {
+                        // Automatically select the new menu controller.
+                        UpdateAvailableMenuControllers();
+                        for (int i = 0; i < _availableMenuControllers.Length; i++)
+                        {
+                            if (_availableMenuControllers[i] == newMenuController)
+                            {
+                                _selectedMenuController = i;
+                            }
+                        }
+                    }));
                 }
                 EditorGUILayout.Space();
             } else if(_selectedMenuController < 0) {
