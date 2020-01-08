@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e9ecc4959f3b6c4eaa850266aa46dbf, type: 3}
   m_Name: EditorMenuCreatorSettings
   m_EditorClassIdentifier: 
-  MenuController: {fileID: 0}
+  MenuController: {fileID: 114561234989414188, guid: f1c989e605418484cad6b1b0f00d0867,
+    type: 3}
   HasCustomPresetFolder: 0
   CustomPresetFolder: 

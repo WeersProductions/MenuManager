@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
+using UnityEditor.Experimental.SceneManagement;
 using UnityEngine;
 using Object = UnityEngine.Object;
 using UnityEditor.SceneManagement;
@@ -64,6 +65,17 @@ namespace WeersProductions
                 {"Create preset", DrawCreatePreset }
             });
             UpdateAvailableMenuControllers();
+            
+#if UNITY_2018_3_OR_NEWER
+            PrefabStage.prefabStageOpened += stage => UpdateAvailableMenuControllers();
+#endif
+        }
+
+        private void OnDisable()
+        {
+#if UNITY_2018_3_OR_NEWER
+            PrefabStage.prefabStageOpened -= stage => UpdateAvailableMenuControllers();
+#endif
         }
 
         private void OnFocus()
@@ -83,6 +95,28 @@ namespace WeersProductions
             _tabsBlock.Draw();
         }
 
+        private void AddPrefabStageMenuControllers(PrefabStage prefabStage)
+        {
+            if (prefabStage.stageHandle.IsValid())
+            {
+                GameObject currentPrefabGameObject = AssetDatabase.LoadAssetAtPath<GameObject>(prefabStage.prefabAssetPath);
+                if (currentPrefabGameObject)
+                {
+                    MenuController[] prefabMenuControllers =
+                        currentPrefabGameObject.GetComponentsInChildren<MenuController>();
+                    if (prefabMenuControllers != null && prefabMenuControllers.Length > 0)
+                    {
+                        int oldSize = _availableMenuControllers.Length;
+                        Array.Resize(ref _availableMenuControllers, oldSize + prefabMenuControllers.Length);
+                        for (int i = 0; i < prefabMenuControllers.Length; i++)
+                        {
+                            _availableMenuControllers[oldSize + i] = prefabMenuControllers[i];
+                        }
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// TODO: now only called when hierarchy changes, not when a new prefab is dragged into the scene.
         /// </summary>
@@ -91,6 +125,15 @@ namespace WeersProductions
             EnsureSettingsObject();
             // TODO: support MenuControllers in prefabs?
             _availableMenuControllers = HierarchyHelper.GetObjectsOfType<MenuController>();
+            
+#if UNITY_2018_3_OR_NEWER
+            // Add the open prefab to the list.
+            PrefabStage currentPrefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+            if (currentPrefabStage != null)
+            {
+                AddPrefabStageMenuControllers(currentPrefabStage);
+            }
+#endif
             int labelSize = _availableMenuControllers.Length;
             _availableMenuControllersLabels = new string[labelSize];
             for(int i = 0; i < _availableMenuControllers.Length; i++) {
