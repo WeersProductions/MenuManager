@@ -131,7 +131,7 @@ namespace WeersProductions
             return ShowMenu(GetPoolObject(id), mcMenuData);
         }
 
-                /// <summary>
+        /// <summary>
         /// Show a specific menu.
         /// If this menu needs fullscreen and the current active menus allow it to override them, it will close the current menus.
         /// </summary>
@@ -175,6 +175,47 @@ namespace WeersProductions
         }
 
         /// <summary>
+        /// Get a menu from the active menus.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <remarks>Uses linear search.</remarks>
+        /// <returns>Null if no active menu of this type exists.</returns>
+        public MCMenu GetMenuActive(Menus id)
+        {
+            for (int i = 0; i < _activeMenus.Count; i++)
+            {
+                if (_activeMenus[i].Id == id)
+                {
+                    return _activeMenus[i];
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Try to get a menu of type from the active menus.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="mcMenu">Set to null if no menu of this type is found. Otherwise is the menu that that is active with type 'id'.</param>
+        /// <remarks>Uses linear search.</remarks>
+        /// <returns>False if no menu of this type is found. </returns>
+        public bool TryGetMenuActive(Menus id, out MCMenu mcMenu)
+        {
+            for (int i = 0; i < _activeMenus.Count; i++)
+            {
+                if (_activeMenus[i].Id == id)
+                {
+                    mcMenu = _activeMenus[i];
+                    return true;
+                }
+            }
+
+            mcMenu = null;
+            return false;
+        }
+        
+        /// <summary>
         /// Will return a duplicate of the original menu in the global MenuController so it can be used in the method <see cref="ShowMenu(WeersProductions.MCMenu,object)"/>
         /// </summary>
         /// <param name="id">The TYPE of the menu</param>
@@ -182,6 +223,27 @@ namespace WeersProductions
         public MCMenu GetMenu(Menus id)
         {
             return GetPoolObject(id);
+        }
+
+        /// <summary>
+        /// Toggles the visibility of a menu. 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="menuData">Any data that needs to be passed to the menu if it gets shown.</param>
+        /// <returns></returns>
+        public MCMenu ToggleMenu(Menus id, object menuData = null)
+        {
+            if (TryGetMenuActive(id, out MCMenu menu))
+            {
+                HideMenu(menu);
+            }
+            else
+            {
+                menu = GetMenu(id);
+                ShowMenu(menu, menuData);
+            }
+
+            return menu;
         }
 
         /// <summary>
@@ -468,6 +530,29 @@ namespace WeersProductions
         }
 
         /// <summary>
+        /// Get a menu from the active menus.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <remarks>Uses linear search.</remarks>
+        /// <returns>Null if no active menu of this type exists.</returns>
+        public static MCMenu GetMenuActiveGlobal(Menus id)
+        {
+            return _instance.GetMenuActive(id);
+        }
+
+        /// <summary>
+        /// Try to get a menu of type from the active menus.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="mcMenu">Set to null if no menu of this type is found. Otherwise is the menu that that is active with type 'id'.</param>
+        /// <remarks>Uses linear search.</remarks>
+        /// <returns>False if no menu of this type is found. </returns>
+        public static bool TryGetMenuActiveGlobal(Menus id, out MCMenu mcMenu)
+        {
+            return _instance.TryGetMenuActive(id, out mcMenu);
+        }
+
+        /// <summary>
         /// Will return a duplicate of the original menu in the global MenuController so it can be used in the method <see cref="ShowMenu(WeersProductions.MCMenu,object)"/>
         /// </summary>
         /// <param name="id">The TYPE of the menu</param>
@@ -486,6 +571,26 @@ namespace WeersProductions
         public static MCMenu ShowMenuGlobal(MCMenu mcMenu, object mcMenuData = null)
         {
             return _instance.ShowMenu(mcMenu, mcMenuData);
+        }
+
+        /// <summary>
+        /// Toggle the visibility of a menu in the global MenuController.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="mcMenuData">Any data that needs to be passed if this menu gets visible.</param>
+        /// <returns></returns>
+        public static MCMenu ToggleMenuGlobal(Menus id, object mcMenuData = null)
+        {
+            if (TryGetMenuActiveGlobal(id, out MCMenu menu))
+            {
+                HideMenuGlobal(menu);
+            }
+            else
+            {
+                menu = GetMenuGlobal(id);
+                ShowMenuGlobal(menu, mcMenuData);
+            }
+            return menu;
         }
 
         /// <summary>

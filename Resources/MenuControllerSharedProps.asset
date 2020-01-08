@@ -4,14 +4,12 @@
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0263b94d6471541ebb5ea918e8974657, type: 3}
   m_Name: MenuControllerSharedProps
   m_EditorClassIdentifier: 
-  _menus:
-  - {fileID: 114553334228017214, guid: 36d852af6484048d086b2ba122c7043d, type: 2}
-  - {fileID: 114194311685405530, guid: fea0f15a66eae42d59f893c5f9ad3f5e, type: 2}
-  - {fileID: 114364968252096826, guid: 26a0a6673dad3f641968ad60a527cf13, type: 2}
+  _menus: []

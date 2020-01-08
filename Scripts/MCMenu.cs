@@ -189,6 +189,28 @@ namespace WeersProductions
         }
 
         /// <summary>
+        /// Toggle visibility of this menu.
+        /// </summary>
+        public void Toggle()
+        {
+            if (IsActive)
+            {
+                Hide();
+            }
+            else
+            {
+                if (!_menuController)
+                {
+                    Debug.LogError($"No MenuController seems to be set for: {_id.ToString()}.");
+                }
+                else
+                {
+                    _menuController.ShowMenu(this);    
+                }
+            }
+        }
+
+        /// <summary>
         /// Called when this menu should be shown, can be used for animations.
         /// </summary>
         /// <param name="data">Can be used to send extra data to the menu.</param>
