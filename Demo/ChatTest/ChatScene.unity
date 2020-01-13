@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 318456808}
   - component: {fileID: 318456807}
   - component: {fileID: 318456812}
+  - component: {fileID: 318456813}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -247,6 +248,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14d7d84a2180c41768ddf63817eda84d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _menuController: {fileID: 318456807}
+--- !u!114 &318456813
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 318456806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2fce36424cded64490ca1ddb2accc64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _disableOthers: 0
+  _startMenu: CHATBOX
   _menuController: {fileID: 318456807}
 --- !u!1 &705507993
 GameObject:
