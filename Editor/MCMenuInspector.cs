@@ -14,12 +14,11 @@ namespace WeersProductions
             DrawDefaultInspector();
 
             EditorGUILayout.Space();
-            IDraggableMenu draggableMenu = target as IDraggableMenu;
-            
-            if (draggableMenu != null)
+
+            if (target is IDraggableMenu draggableMenu)
             {
                 EditorGUILayout.HelpBox("Will set the owner variable of all Draggable child components to this menu.", MessageType.Info);
-                if (GUILayout.Button("Initalize draggables"))
+                if (GUILayout.Button("Initialize draggables"))
                 {
                     InitializeDraggables(draggableMenu);
                 }
