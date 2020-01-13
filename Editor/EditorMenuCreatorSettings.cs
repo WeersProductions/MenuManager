@@ -110,6 +110,8 @@ namespace WeersProductions
         /// </summary>
         public string CustomPresetFolder;
 
+        public bool DetailView;
+
         public string CustomPresetFolderFull
         {
             get { return Path.Combine(Application.dataPath, CustomPresetFolder); }

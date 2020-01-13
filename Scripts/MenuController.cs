@@ -9,19 +9,6 @@ namespace WeersProductions
     public class MenuController : MonoBehaviour
     {
         /// <summary>
-        /// Static references to the ids of all the menus and popups. Makes it easy to change ids.
-        /// </summary>
-        public enum Menus
-        {
-            UNDEFINED = -2,
-            NONE = -1,
-            SIMPLEPOPUP = 0,
-            SIMPLETOOLTIP = 1,
-            GENERALWINDOW = 2,
-            GAMEMENU = 3
-        }
-
-        /// <summary>
         /// Singleton reference to the global MenuController instance.
         /// </summary>
         private static MenuController _instance;
@@ -41,7 +28,7 @@ namespace WeersProductions
         /// <summary>
         /// Used for faster lookup during runtime of menus with specified ids.
         /// </summary>
-        private readonly Dictionary<Menus, MCMenu> _menus = new Dictionary<Menus, MCMenu>();
+        private readonly Dictionary<string, MCMenu> _menus = new Dictionary<string, MCMenu>();
 
         /// <summary>
         /// A list of the active menus on screen.
@@ -51,7 +38,7 @@ namespace WeersProductions
         /// <summary>
         /// A set of pooling objects from menus.
         /// </summary>
-        private readonly Dictionary<Menus, Queue<MCMenu>> _menuPool = new Dictionary<Menus, Queue<MCMenu>>();
+        private readonly Dictionary<string, Queue<MCMenu>> _menuPool = new Dictionary<string, Queue<MCMenu>>();
 
         /// <summary>
         /// A queue of menus that want to be popupped up when another menu is closed.
@@ -126,7 +113,7 @@ namespace WeersProductions
         /// </summary>
         /// <param name="id">The unique id of a menu.</param>
         /// <param name="mcMenuData"></param>
-        public MCMenu ShowMenu(Menus id, object mcMenuData = null) 
+        public MCMenu ShowMenu(string id, object mcMenuData = null) 
         {
             return ShowMenu(GetPoolObject(id), mcMenuData);
         }
@@ -180,7 +167,7 @@ namespace WeersProductions
         /// <param name="id"></param>
         /// <remarks>Uses linear search.</remarks>
         /// <returns>Null if no active menu of this type exists.</returns>
-        public MCMenu GetMenuActive(Menus id)
+        public MCMenu GetMenuActive(string id)
         {
             for (int i = 0; i < _activeMenus.Count; i++)
             {
@@ -200,7 +187,7 @@ namespace WeersProductions
         /// <param name="mcMenu">Set to null if no menu of this type is found. Otherwise is the menu that that is active with type 'id'.</param>
         /// <remarks>Uses linear search.</remarks>
         /// <returns>False if no menu of this type is found. </returns>
-        public bool TryGetMenuActive(Menus id, out MCMenu mcMenu)
+        public bool TryGetMenuActive(string id, out MCMenu mcMenu)
         {
             for (int i = 0; i < _activeMenus.Count; i++)
             {
@@ -220,7 +207,7 @@ namespace WeersProductions
         /// </summary>
         /// <param name="id">The TYPE of the menu</param>
         /// <returns></returns>
-        public MCMenu GetMenu(Menus id)
+        public MCMenu GetMenu(string id)
         {
             return GetPoolObject(id);
         }
@@ -231,7 +218,7 @@ namespace WeersProductions
         /// <param name="id"></param>
         /// <param name="menuData">Any data that needs to be passed to the menu if it gets shown.</param>
         /// <returns></returns>
-        public MCMenu ToggleMenu(Menus id, object menuData = null)
+        public MCMenu ToggleMenu(string id, object menuData = null)
         {
             if (TryGetMenuActive(id, out MCMenu menu))
             {
@@ -313,12 +300,14 @@ namespace WeersProductions
         /// <param name="id"></param>
         /// <param name="createWhenNoMenu"></param>
         /// <param name="data"></param>
-        public MCMenu AddPopup(Menus id, bool createWhenNoMenu, object data = null)
+        public MCMenu AddPopup(string id, bool createWhenNoMenu, object data = null)
         {
-            if (id == Menus.NONE)
+#if UNITY_EDITOR
+            if (string.IsNullOrWhiteSpace(id))
             {
-                return null;
+                Debug.LogError("You are trying to add a popup, but the id is empty. This is probably a mistake.");
             }
+#endif
             return AddPopup(GetPoolObject(id), createWhenNoMenu, data);
         }
 
@@ -329,12 +318,14 @@ namespace WeersProductions
         /// <param name="parent">The parent object that already exists.</param>
         /// <param name="data">Data that should be passed on to the popup that is created.</param>
         /// <returns></returns>
-        public MCMenu AddPopup(Menus id, MCMenu parent, object data = null)
+        public MCMenu AddPopup(string id, MCMenu parent, object data = null)
         {
-            if (id == Menus.NONE)
+#if UNITY_EDITOR
+            if (string.IsNullOrWhiteSpace(id))
             {
-                return null;
+                Debug.LogError("You are trying to add a popup, but the id is empty. This is probably a mistake.");
             }
+#endif
             return parent.AddPopup(GetPoolObject(id), data);
         } 
 
@@ -343,7 +334,7 @@ namespace WeersProductions
         /// </summary>
         /// <param name="menu"></param>
         /// <returns></returns>
-        private MCMenu GetPoolObject(Menus menu)
+        private MCMenu GetPoolObject(string menu)
         {
             Queue<MCMenu> menus;
             if (_menuPool.TryGetValue(menu, out menus))
@@ -524,7 +515,7 @@ namespace WeersProductions
         /// </summary>
         /// <param name="id">The unique id of a menu.</param>
         /// <param name="mcMenuData"></param>
-        public static MCMenu ShowMenuGlobal(Menus id, object mcMenuData = null)
+        public static MCMenu ShowMenuGlobal(string id, object mcMenuData = null)
         {
             return _instance.ShowMenu(id, mcMenuData);
         }
@@ -535,7 +526,7 @@ namespace WeersProductions
         /// <param name="id"></param>
         /// <remarks>Uses linear search.</remarks>
         /// <returns>Null if no active menu of this type exists.</returns>
-        public static MCMenu GetMenuActiveGlobal(Menus id)
+        public static MCMenu GetMenuActiveGlobal(string id)
         {
             return _instance.GetMenuActive(id);
         }
@@ -547,7 +538,7 @@ namespace WeersProductions
         /// <param name="mcMenu">Set to null if no menu of this type is found. Otherwise is the menu that that is active with type 'id'.</param>
         /// <remarks>Uses linear search.</remarks>
         /// <returns>False if no menu of this type is found. </returns>
-        public static bool TryGetMenuActiveGlobal(Menus id, out MCMenu mcMenu)
+        public static bool TryGetMenuActiveGlobal(string id, out MCMenu mcMenu)
         {
             return _instance.TryGetMenuActive(id, out mcMenu);
         }
@@ -557,7 +548,7 @@ namespace WeersProductions
         /// </summary>
         /// <param name="id">The TYPE of the menu</param>
         /// <returns></returns>
-        public static MCMenu GetMenuGlobal(Menus id)
+        public static MCMenu GetMenuGlobal(string id)
         {
             return _instance.GetMenu(id);
         }
@@ -579,7 +570,7 @@ namespace WeersProductions
         /// <param name="id"></param>
         /// <param name="mcMenuData">Any data that needs to be passed if this menu gets visible.</param>
         /// <returns></returns>
-        public static MCMenu ToggleMenuGlobal(Menus id, object mcMenuData = null)
+        public static MCMenu ToggleMenuGlobal(string id, object mcMenuData = null)
         {
             if (TryGetMenuActiveGlobal(id, out MCMenu menu))
             {
@@ -646,7 +637,7 @@ namespace WeersProductions
         /// <param name="id"></param>
         /// <param name="createWhenNoMenu"></param>
         /// <param name="data"></param>
-        public static MCMenu AddPopupGlobal(Menus id, bool createWhenNoMenu, object data = null)
+        public static MCMenu AddPopupGlobal(string id, bool createWhenNoMenu, object data = null)
         {
             return _instance.AddPopup(id, createWhenNoMenu, data);
         }
@@ -658,7 +649,7 @@ namespace WeersProductions
         /// <param name="parent">The parent object that already exists.</param>
         /// <param name="data">Data that should be passed on to the popup that is created.</param>
         /// <returns></returns>
-        public static MCMenu AddPopupGlobal(Menus id, MCMenu parent, object data = null)
+        public static MCMenu AddPopupGlobal(string id, MCMenu parent, object data = null)
         {
             return _instance.AddPopup(id, parent, data);
         }

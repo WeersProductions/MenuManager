@@ -250,7 +250,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _disableOthers: 0
-  _startMenu: 3
+  _startMenu: MAINWINDOW
   _menuController: {fileID: 0}
 --- !u!1 &595912488
 GameObject:

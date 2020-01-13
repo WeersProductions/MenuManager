@@ -24,7 +24,7 @@ namespace WeersProductions
         /// A unique id for this menu.
         /// </summary>
         [SerializeField]
-        private MenuController.Menus _id;
+        private string _id;
 
         /// <summary>
         /// If true clicking outside of the window will be blocked.
@@ -95,7 +95,7 @@ namespace WeersProductions
         /// </summary>
         public bool IsActive => _isActive;
 
-        public MenuController.Menus Id
+        public string Id
         {
             get { return _id; }
         }
@@ -313,7 +313,7 @@ namespace WeersProductions
         /// <param name="id"></param>
         /// <param name="data">Data that is passed to the popup that is created.</param>
         /// <returns>The new popup object.</returns>
-        public MCMenu AddPopup(MenuController.Menus id, object data = null)
+        public MCMenu AddPopup(string id, object data = null)
         {
             return _menuController.AddPopup(id, this, data);
         }
@@ -333,7 +333,7 @@ namespace WeersProductions
         /// Remove all popups with a certain Id from this menu.
         /// </summary>
         /// <param name="id"></param>
-        public void RemovePopup(MenuController.Menus id)
+        public void RemovePopup(string id)
         {
             List<MCMenu> copy = new List<MCMenu>(PopupMenus);
             for (int i = 0; i < copy.Count; i++)
@@ -422,7 +422,7 @@ namespace WeersProductions
         /// Used by the editor script, normally you do not want to set the id and therefore it's not available during run-time.
         /// </summary>
         /// <param name="menus"></param>
-        public void SetId(MenuController.Menus menus)
+        public void SetId(string menus)
         {
             _id = menus;
         }

@@ -19,7 +19,7 @@ namespace WeersProductions
 		/// Define what menu should be shown.
 		/// </summary>
 		[SerializeField]
-		private MenuController.Menus _menu = MenuController.Menus.SIMPLETOOLTIP;
+		private string _menu = "SIMPLETOOLTIP";
 		/// <summary>
 		/// The text that is shown when the tooltip is active.
 		/// </summary>
@@ -34,6 +34,14 @@ namespace WeersProductions
 
 		private void Awake() 
 		{
+#if UNITY_EDITOR
+			if (string.IsNullOrWhiteSpace(_menu))
+			{
+				Debug.LogError("You are trying to use tooltips, but without any menu. Please set the menu that should be used for tooltips.");
+				return;
+			}
+#endif
+			
 			OnHover onHover = this.gameObject.AddComponent<OnHover>();
 			onHover.Delay = _tooltipDelay;
 			onHover.onPointerDelay = () => {

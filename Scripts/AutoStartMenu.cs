@@ -18,7 +18,7 @@ namespace WeersProductions
         /// This menu will be shown at the start of the scene.
         /// </summary>
         [SerializeField]
-        private MenuController.Menus _startMenu;
+        private string _startMenu;
 
         /// <summary>
         /// If set, this MenuController is used to show the menu. Otherwise, Global is used.
@@ -37,13 +37,18 @@ namespace WeersProductions
                 }
             }
 
-            if (_startMenu != MenuController.Menus.NONE && _startMenu != MenuController.Menus.UNDEFINED)
+#if UNITY_EDITOR
+            if (string.IsNullOrWhiteSpace(_startMenu))
             {
-                if (_menuController) {
-                    _menuController.ShowMenu(_startMenu);
-                } else {
-                    MenuController.ShowMenuGlobal(_startMenu);
-                }
+                Debug.LogError("You are trying to use AutoStartMenu, but without any menu. Please set the menu that should be started.");
+                return;
+            }
+#endif
+           
+            if (_menuController) {
+                _menuController.ShowMenu(_startMenu);
+            } else {
+                MenuController.ShowMenuGlobal(_startMenu);
             }
         }
     }
