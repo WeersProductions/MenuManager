@@ -609,5 +609,7 @@ namespace WeersProductions
             _editorMenuCreatorSettings.MenuController = menuController;
             EditorUtility.SetDirty(_editorMenuCreatorSettings);
         }
+
+        
     }
 }

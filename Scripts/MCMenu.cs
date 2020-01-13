@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -390,16 +392,6 @@ namespace WeersProductions
             
         }
 
-        private void OnValidate()
-        {
-            _canvasGroup = GetComponent<CanvasGroup>();
-            if (!_canvasGroup)
-            {
-                // This is an old menu that does not have the canvasgroup yet.
-                Debug.LogError(string.Format("Please add a CanvasGroup to {0}. From now on CanvasGroups are used to activate/deactivate the menus.", this.name));
-            }
-        }
-
         /// <summary>
         /// Sets the object active or not. Will use the canvasgroup to hide the menu.
         /// Is called by MenuController when hiding/showing menus.
@@ -418,6 +410,35 @@ namespace WeersProductions
         }
 
 #if UNITY_EDITOR
+        private void OnValidate()
+        {
+            _canvasGroup = GetComponent<CanvasGroup>();
+            if (!_canvasGroup)
+            {
+                // This is an old menu that does not have the canvasgroup yet.
+                Debug.LogError(
+                    $"Please add a CanvasGroup to {name}. From now on CanvasGroups are used to activate/deactivate the menus.");
+            }
+
+            List<MCMenu> ids = GetSimilarIDs(this);
+            if (ids.Count > 0)
+            {
+                string join = "";
+                for (int i = 0; i < ids.Count; i++)
+                {
+                    join += ids[i].name;
+                    if (i < ids.Count - 2)
+                    {
+                        join += ", ";   
+                    } else if (i == ids.Count - 2)
+                    {
+                        join += " and ";
+                    }
+                }
+                Debug.LogError($"The following prefabs have the same IDs: {join}. Make sure IDs are unique.");
+            }
+        }
+        
         /// <summary>
         /// Used by the editor script, normally you do not want to set the id and therefore it's not available during run-time.
         /// </summary>
@@ -425,6 +446,60 @@ namespace WeersProductions
         public void SetId(string menus)
         {
             _id = menus;
+        }
+        
+        /// <summary>
+        /// Goes through all prefabs and gets all IDs.
+        /// </summary>
+        /// <returns></returns>
+        public static Dictionary<string, List<MCMenu>> GetAllIDs()
+        {
+            Dictionary<string, List<MCMenu>> ids = new Dictionary<string, List<MCMenu>>();
+
+            GameObject[] allGameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
+            for (int i = 0; i < allGameObjects.Length; i++)
+            {
+                MCMenu menu = allGameObjects[i].GetComponentInChildren<MCMenu>();
+                if (menu)
+                {
+                    if (ids.TryGetValue(menu.Id, out List<MCMenu> menus))
+                    {
+                        menus.Add(menu);
+                    }
+                    else
+                    {
+                        ids.Add(menu.Id, new List<MCMenu>{menu});
+                    }
+                }
+            }
+
+            return ids;
+        }
+
+        public static List<MCMenu> GetSimilarIDs(MCMenu comparison)
+        {
+            string id = comparison.Id;
+            List<MCMenu> ids = new List<MCMenu>();
+            GameObject[] allGameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
+            for (int i = 0; i < allGameObjects.Length; i++)
+            {
+                MCMenu menu = allGameObjects[i].GetComponentInChildren<MCMenu>();
+                if (menu)
+                {
+                    if (string.Equals(menu.Id, id) && comparison != menu)
+                    {
+                        ids.Add(menu);
+                    }
+                }
+            }
+
+            // If we are the only instance, remove us.
+            if (ids.Count == 1)
+            {
+                ids.Clear();
+            }
+
+            return ids;
         }
 #endif
     }

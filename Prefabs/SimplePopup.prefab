@@ -328,7 +328,7 @@ GameObject:
   - component: {fileID: 114848093640832058}
   - component: {fileID: 225448435177096368}
   m_Layer: 5
-  m_Name: SimplePopup(Clone)
+  m_Name: SimplePopup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
