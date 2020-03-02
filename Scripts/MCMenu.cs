@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -24,7 +26,7 @@ namespace WeersProductions
         /// A unique id for this menu.
         /// </summary>
         [SerializeField]
-        private MenuController.Menus _id;
+        private string _id;
 
         /// <summary>
         /// If true clicking outside of the window will be blocked.
@@ -95,7 +97,7 @@ namespace WeersProductions
         /// </summary>
         public bool IsActive => _isActive;
 
-        public MenuController.Menus Id
+        public string Id
         {
             get { return _id; }
         }
@@ -313,7 +315,7 @@ namespace WeersProductions
         /// <param name="id"></param>
         /// <param name="data">Data that is passed to the popup that is created.</param>
         /// <returns>The new popup object.</returns>
-        public MCMenu AddPopup(MenuController.Menus id, object data = null)
+        public MCMenu AddPopup(string id, object data = null)
         {
             return _menuController.AddPopup(id, this, data);
         }
@@ -333,7 +335,7 @@ namespace WeersProductions
         /// Remove all popups with a certain Id from this menu.
         /// </summary>
         /// <param name="id"></param>
-        public void RemovePopup(MenuController.Menus id)
+        public void RemovePopup(string id)
         {
             List<MCMenu> copy = new List<MCMenu>(PopupMenus);
             for (int i = 0; i < copy.Count; i++)
@@ -390,16 +392,6 @@ namespace WeersProductions
             
         }
 
-        private void OnValidate()
-        {
-            _canvasGroup = GetComponent<CanvasGroup>();
-            if (!_canvasGroup)
-            {
-                // This is an old menu that does not have the canvasgroup yet.
-                Debug.LogError(string.Format("Please add a CanvasGroup to {0}. From now on CanvasGroups are used to activate/deactivate the menus.", this.name));
-            }
-        }
-
         /// <summary>
         /// Sets the object active or not. Will use the canvasgroup to hide the menu.
         /// Is called by MenuController when hiding/showing menus.
@@ -418,13 +410,96 @@ namespace WeersProductions
         }
 
 #if UNITY_EDITOR
+        private void OnValidate()
+        {
+            _canvasGroup = GetComponent<CanvasGroup>();
+            if (!_canvasGroup)
+            {
+                // This is an old menu that does not have the canvasgroup yet.
+                Debug.LogError(
+                    $"Please add a CanvasGroup to {name}. From now on CanvasGroups are used to activate/deactivate the menus.");
+            }
+
+            List<MCMenu> ids = GetSimilarIDs(this);
+            if (ids.Count > 0)
+            {
+                string join = "";
+                for (int i = 0; i < ids.Count; i++)
+                {
+                    join += ids[i].name;
+                    if (i < ids.Count - 2)
+                    {
+                        join += ", ";   
+                    } else if (i == ids.Count - 2)
+                    {
+                        join += " and ";
+                    }
+                }
+                Debug.LogError($"The following prefabs have the same IDs: {join}. Make sure IDs are unique.");
+            }
+        }
+        
         /// <summary>
         /// Used by the editor script, normally you do not want to set the id and therefore it's not available during run-time.
         /// </summary>
         /// <param name="menus"></param>
-        public void SetId(MenuController.Menus menus)
+        public void SetId(string menus)
         {
             _id = menus;
+        }
+        
+        /// <summary>
+        /// Goes through all prefabs and gets all IDs.
+        /// </summary>
+        /// <returns></returns>
+        public static Dictionary<string, List<MCMenu>> GetAllIDs()
+        {
+            Dictionary<string, List<MCMenu>> ids = new Dictionary<string, List<MCMenu>>();
+
+            GameObject[] allGameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
+            for (int i = 0; i < allGameObjects.Length; i++)
+            {
+                MCMenu menu = allGameObjects[i].GetComponentInChildren<MCMenu>();
+                if (menu)
+                {
+                    if (ids.TryGetValue(menu.Id, out List<MCMenu> menus))
+                    {
+                        menus.Add(menu);
+                    }
+                    else
+                    {
+                        ids.Add(menu.Id, new List<MCMenu>{menu});
+                    }
+                }
+            }
+
+            return ids;
+        }
+
+        public static List<MCMenu> GetSimilarIDs(MCMenu comparison)
+        {
+            string id = comparison.Id;
+            List<MCMenu> ids = new List<MCMenu>();
+            GameObject[] allGameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
+            for (int i = 0; i < allGameObjects.Length; i++)
+            {
+                MCMenu menu = allGameObjects[i].GetComponentInChildren<MCMenu>();
+                if (menu)
+                {
+                    if (string.Equals(menu.Id, id) && comparison != menu)
+                    {
+                        ids.Add(menu);
+                    }
+                }
+            }
+
+            // If we are the only instance, remove us.
+            if (ids.Count == 1)
+            {
+                ids.Clear();
+            }
+
+            return ids;
         }
 #endif
     }

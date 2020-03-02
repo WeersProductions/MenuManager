@@ -17,7 +17,7 @@ namespace WeersProductions
         private void CreatePopup(int count, MCMenu parent)
         {
             // Get the Menu object, we need this because we have a button that closes the menu.
-            MCMenu popupMenu = MenuController.GetMenuGlobal(MenuController.Menus.SIMPLEPOPUP);
+            MCMenu popupMenu = MenuController.GetMenuGlobal("SIMPLEPOPUP");
 
             // Create the data for the menu.
             MCSimplePopupData simplePopupData = new MCSimplePopupData("title " + count, "This is another popup.",

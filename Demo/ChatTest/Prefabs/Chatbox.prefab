@@ -762,7 +762,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _canvasGroup: {fileID: 8443185387397938899}
-  _id: 3
+  _id: CHATBOX
   _blockOutsideRaycasting: 1
   _fullscreen: 0
   _canBeClosed: 1

@@ -13,7 +13,7 @@ public class InputController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.C))
         {
-            _menuController.ToggleMenu(MenuController.Menus.GAMEMENU);
+            _menuController.ToggleMenu("CHATBOX");
         }
     }
 }

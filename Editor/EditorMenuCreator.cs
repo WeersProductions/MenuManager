@@ -194,8 +194,13 @@ namespace WeersProductions
                 EditorGUILayout.HelpBox("Select a MenuController to change specific menus.", MessageType.Info);
             }
             
-            if(hasMenuControllerSelected) {
+            if(hasMenuControllerSelected)
+            {
+                EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Specific menus", EditorStyles.boldLabel);
+                GUILayout.FlexibleSpace();
+                _editorMenuCreatorSettings.DetailView = EditorGUILayout.Toggle("Detailed", _editorMenuCreatorSettings.DetailView);
+                EditorGUILayout.EndHorizontal();
                 EditorGUILayout.Space();
 
                 _menuController.Update();
@@ -209,6 +214,22 @@ namespace WeersProductions
                         RemoveMenuFromController(i);
                     }
                     EditorGUILayout.EndHorizontal();
+                    
+                    // Show extra details, like the menuId.
+                    if (_editorMenuCreatorSettings.DetailView)
+                    {
+                        using (new EditorGUI.IndentLevelScope())
+                        {
+                            SerializedObject serializedMenu = new SerializedObject(arrayProperty.GetArrayElementAtIndex(i).objectReferenceValue);
+                            SerializedProperty serializedMenuID = serializedMenu.FindProperty("_id");
+                            if (serializedMenuID != null)
+                            {
+                                EditorGUILayout.PropertyField(serializedMenuID);
+                            }
+
+                            serializedMenu.ApplyModifiedProperties();
+                        }
+                    }
                 }
                 EditorGUILayout.Space();
                 _menuController.ApplyModifiedProperties();
@@ -588,5 +609,7 @@ namespace WeersProductions
             _editorMenuCreatorSettings.MenuController = menuController;
             EditorUtility.SetDirty(_editorMenuCreatorSettings);
         }
+
+        
     }
 }
