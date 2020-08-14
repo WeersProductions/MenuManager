@@ -105,6 +105,7 @@ namespace WeersProductions
             outsideMenuRect.anchorMin = Vector2.zero;
             outsideMenuRect.anchorMax = Vector2.one;
             outsideMenuGameObject.SetActive(false);
+            outsideMenuGameObject.AddComponent<CanvasRenderer>();
             return outsideMenuGameObject.AddComponent<NonDrawingGraphic>();
         }
 
