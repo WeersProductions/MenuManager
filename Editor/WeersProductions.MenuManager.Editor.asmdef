@@ -1,0 +1,17 @@
+{
+    "name": "WeersProductions.MenuManager.Editor",
+    "references": [
+        "GUID:9dbe64bc36485d240a36a62daa1613f3"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
