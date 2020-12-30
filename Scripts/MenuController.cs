@@ -202,6 +202,16 @@ namespace WeersProductions
             mcMenu = null;
             return false;
         }
+
+        /// <summary>
+        /// Gets all active menus.
+        /// </summary>
+        /// <remarks>Converts internal list to array, as the internal list should not be modified.</remarks>
+        /// <returns>Array of active MCMenus objects.</returns>
+        public MCMenu[] GetActiveMenus()
+        {
+            return _activeMenus.ToArray();
+        }
         
         /// <summary>
         /// Will return a duplicate of the original menu in the global MenuController so it can be used in the method <see cref="ShowMenu(WeersProductions.MCMenu,object)"/>
@@ -542,6 +552,17 @@ namespace WeersProductions
         public static bool TryGetMenuActiveGlobal(string id, out MCMenu mcMenu)
         {
             return _instance.TryGetMenuActive(id, out mcMenu);
+        }
+
+        /// <summary>
+        /// Gets all active menus on the global MenuController instance.
+        /// </summary>
+        /// <remarks>Converts internal list to array, as the internal list should not be modified.
+        /// Only returns active menu objects of the global MenuController instance, use <see cref="GetAllActiveMenuControllers"/> in combination with this method to retrieve all active menus on all controllers</remarks>
+        /// <returns>Array of active MCMenus objects.</returns>
+        public static MCMenu[] GetActiveMenusGlobal()
+        {
+            return _instance.GetActiveMenus();
         }
 
         /// <summary>
