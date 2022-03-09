@@ -1,0 +1,19 @@
+{
+  "name": "com.weersproductions.menumanager",
+  "version": "1.0.0",
+  "displayName": "MenuManager",
+  "description": "A manager for menus inside UGUI. Takes care of showing/hiding/pooling windows.",
+  "unity": "2020",
+  "documentationUrl": "https://example.com/",
+  "changelogUrl": "https://example.com/changelog.html",
+  "licensesUrl": "https://example.com/licensing.html",
+ "keywords": [
+    "UGUI",
+    "Window Manager"
+  ],
+  "author": {
+    "name": "Floris Weers",
+    "email": "menumanager@weers.dev",
+    "url": "https://www.weers.dev"
+  }
+}
