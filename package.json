@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "displayName": "MenuManager",
   "description": "A manager for menus inside UGUI. Takes care of showing/hiding/pooling windows.",
-  "unity": "2020",
+  "unity": "2020.0",
   "documentationUrl": "https://example.com/",
   "changelogUrl": "https://example.com/changelog.html",
   "licensesUrl": "https://example.com/licensing.html",
